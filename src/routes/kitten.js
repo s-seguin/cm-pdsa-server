@@ -10,14 +10,29 @@ router.get('/', (req, res) => {
   );
 });
 
+/**
+ * Create a new kitten, the url contains the age and name.
+ */
 router.get('/new/name=:name&age=:age', newKitten);
 
+/**
+ * Find a kitten by name provided in URL.
+ */
 router.get('/find/name=:name', findByName);
 
+/**
+ * Find a kitten by age provided in URL.
+ */
 router.get('/find/age=:age', findByAge);
 
+/**
+ * Return all kittens.
+ */
 router.get('/find/all', findAll);
 
+/**
+ * Rename a kitten - might not be working.
+ */
 router.get('/rename/oldName=:name&newName=:newName', rename);
 
 export default router;

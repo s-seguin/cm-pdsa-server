@@ -27,3 +27,8 @@ Entry point for this application is `index.js`, as we are using ESM to provide E
 Routes should be kept clean and all logic should reside in a controller. See example `/kitten` route and `kitten` controller as an example.
 
 Database connects to local `test` MongoDB via Mongoose, connection is opened upon server initialization. This will need to be changed for Production.
+
+## Running
+
+1. `npm i` to install all dependencies.
+2. `npm start` to start server using `nodemon`.
