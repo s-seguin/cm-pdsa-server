@@ -1,7 +1,7 @@
 import Kitten from '../database/models/kitten';
 
 /**
- * Return the kittens by name in the request from the database.
+ * Get all of the kittens that match the name in the request, and send them in the response as JSON.
  * @param {*} req the http request object
  * @param {*} res http response object
  */
@@ -13,7 +13,7 @@ export function findByName(req, res) {
 }
 
 /**
- * Return the kittens that match the age in the request.
+ * Get all of the kittens that match the age in the request, and send them in the response as JSON.
  * @param {*} req the http request object
  * @param {*} res the http response object
  */
@@ -25,7 +25,7 @@ export function findByAge(req, res) {
 }
 
 /**
- * Return all of the kittens in the database.
+ * Get all of the kittens, and send them in the response as JSON.
  * @param {*} req the http request object
  * @param {*} res the http response object
  */
@@ -37,7 +37,7 @@ export function findAll(req, res) {
 }
 
 /**
- * Create a new kitten with the name and age parameters in the request.
+ * Create a new kitten with the name and age parameters in the request, send result back in response.
  * @param {*} req the http request object
  * @param {*} res the http response object
  */
