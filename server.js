@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 
-//  var app = require("../index");
 import app from './src/app';
 import connection from './src/database/connection';
 
