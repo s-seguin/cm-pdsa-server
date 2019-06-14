@@ -1,5 +1,12 @@
 import PdsaItem from '../database/models/pdsaItem';
 
+/**
+ * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
+ *
+ * TODO: Add validation that the data being received is correct.
+ * @param {*} req the request object
+ * @param {*} res the response object
+ */
 export const newItem = (req, res) => {
   const item = new PdsaItem(req.body);
   item.save(err => {
@@ -10,6 +17,12 @@ export const newItem = (req, res) => {
   });
 };
 
+/**
+ * Get all of the PDSA types in the database.
+ *
+ * @param {*} req
+ * @param {*} res
+ */
 export const findAllItems = (req, res) => {
   PdsaItem.find()
     .populate('pdsaType')
