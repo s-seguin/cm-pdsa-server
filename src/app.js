@@ -5,7 +5,6 @@ import logger from 'morgan';
 
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
-import kittenRouter from './routes/kitten';
 import pdsaRouter from './routes/pdsa';
 import pdsaTypeRouter from './routes/pdsaType';
 import skillAreaRouter from './routes/skillArea';
@@ -18,7 +17,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/kitten', kittenRouter);
 app.use('/users', usersRouter);
 app.use('/skills', skillAreaRouter);
 app.use('/pdsa/type', pdsaTypeRouter);
