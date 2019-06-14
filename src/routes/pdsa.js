@@ -1,14 +1,10 @@
 import express from 'express';
-import { newItem, findAll, newType, findAllType } from '../controllers/pdsaController';
+import { newItem, findAllItems } from '../controllers/pdsaItemController';
 
 const router = express.Router();
 
 router.post('/new', newItem);
 
-router.post('/new/type', newType);
-
-router.get('/find/all', findAll);
-
-router.get('/find/all/type', findAllType);
+router.get('/find/all', findAllItems);
 
 export default router;
