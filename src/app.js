@@ -6,6 +6,7 @@ import logger from 'morgan';
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import kittenRouter from './routes/kitten';
+import pdsaRouter from './routes/pdsa';
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/kitten', kittenRouter);
 app.use('/users', usersRouter);
+app.use('/pdsa', pdsaRouter);
 app.use('/', indexRouter);
 
 export default app;
