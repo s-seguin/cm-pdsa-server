@@ -12,7 +12,7 @@ export const newItem = (req, res) => {
   item.save(err => {
     if (err) {
       console.log(`Error: ${err}`);
-      res.send(err);
+      res.send(`Error: ${err}`);
     } else res.sendStatus(200);
   });
 };
@@ -29,7 +29,7 @@ export const findAllItems = (req, res) => {
     .populate('primarySkillArea')
     .populate('secondarySkillArea')
     .exec((err, items) => {
-      if (err) return console.error(err);
+      if (err) return res.send(`Error: ${err}`);
       return res.send(items);
     });
 };

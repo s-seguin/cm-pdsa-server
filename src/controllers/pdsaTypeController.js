@@ -12,14 +12,14 @@ export const newType = (req, res) => {
   item.save(err => {
     if (err) {
       console.log(`Error: ${err}`);
-      res.send(err);
+      res.send(`Error: ${err}`);
     } else res.sendStatus(200);
   });
 };
 
 export const findAllTypes = (req, res) => {
   PdsaType.find((err, items) => {
-    if (err) return console.error(err);
+    if (err) return res.send(`Error: ${err}`);
     return res.send(items);
   });
 };
