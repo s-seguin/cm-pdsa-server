@@ -1,4 +1,4 @@
-import PdsaItem from '../database/models/pdsaItem';
+import Certification from '../database/models/types/certification';
 
 /**
  * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
@@ -7,8 +7,8 @@ import PdsaItem from '../database/models/pdsaItem';
  * @param {*} req the request object
  * @param {*} res the response object
  */
-export const newItem = (req, res) => {
-  const item = new PdsaItem(req.body);
+export const newCertification = (req, res) => {
+  const item = new Certification(req.body);
   item.save(err => {
     if (err) {
       console.log(`Error: ${err}`);
@@ -23,8 +23,8 @@ export const newItem = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-export const findAllItems = (req, res) => {
-  PdsaItem.find()
+export const findAllCertifications = (req, res) => {
+  Certification.find()
     .populate('primarySkillArea')
     .populate('secondarySkillArea')
     .exec((err, items) => {

@@ -1,4 +1,4 @@
-import PdsaItem from '../database/models/pdsaItem';
+import Book from '../database/models/types/book';
 
 /**
  * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
@@ -7,8 +7,8 @@ import PdsaItem from '../database/models/pdsaItem';
  * @param {*} req the request object
  * @param {*} res the response object
  */
-export const newItem = (req, res) => {
-  const item = new PdsaItem(req.body);
+export const newBook = (req, res) => {
+  const item = new Book(req.body);
   item.save(err => {
     if (err) {
       console.log(`Error: ${err}`);
@@ -23,8 +23,8 @@ export const newItem = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-export const findAllItems = (req, res) => {
-  PdsaItem.find()
+export const findAllBooks = (req, res) => {
+  Book.find()
     .populate('primarySkillArea')
     .populate('secondarySkillArea')
     .exec((err, items) => {
