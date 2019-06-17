@@ -11,6 +11,6 @@ router.post('/new', newType);
 /**
  * Route to return all of the PDSA types in the database
  */
-router.get('find/all', findAllTypes);
+router.get('/find/all', findAllTypes);
 
 export default router;
