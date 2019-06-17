@@ -24,7 +24,7 @@ All development work should be done on your own branch.
 
 Entry point for this application is `index.js`, as we are using ESM to provide ES6 compatibility.
 
-Routes should be kept clean and all logic should reside in a controller. See example `/kitten` route and `kitten` controller as an example.
+Routes should be kept clean and all logic should reside in a controller.
 
 Database connects to local `test` MongoDB via Mongoose, connection is opened upon server initialization. This will need to be changed for Production.
 
