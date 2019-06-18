@@ -8,6 +8,7 @@ import usersRouter from './routes/users';
 import pdsaRouter from './routes/pdsa';
 import pdsaTypeRouter from './routes/pdsaType';
 import skillAreaRouter from './routes/skillArea';
+import authRouter from './routes/auth';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/users', usersRouter);
 app.use('/skills', skillAreaRouter);
 app.use('/pdsa/type', pdsaTypeRouter);
 app.use('/pdsa', pdsaRouter);
+app.use('/login', authRouter);
 
 app.use('/', indexRouter);
 
