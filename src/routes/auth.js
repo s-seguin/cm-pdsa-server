@@ -1,10 +1,15 @@
 import express from 'express';
+import passport from 'passport';
+const passportSetup = require('../controllers/authController');
 
 const router = express.Router();
 
 //OneLogin Auth
-router.get('/', (req, res) => {
-  res.send('<h1>Login Page</h1>');
-});
+router.get(
+  '/',
+  passport.authenticate('openidconnect', {
+    scope: 'profile'
+  })
+);
 
 export default router;
