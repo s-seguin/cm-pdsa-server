@@ -1,14 +1,14 @@
-import Book from '../database/models/types/book';
+import Conference from '../../database/models/types/conference';
 
 /**
- * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
+ * Creates a new Conference to store in the DB from the JSON data passed in the req.body.
  *
  * TODO: Add validation that the data being received is correct.
  * @param {*} req the request object
  * @param {*} res the response object
  */
-export const newBook = (req, res) => {
-  const item = new Book(req.body);
+export const newConference = (req, res) => {
+  const item = new Conference(req.body);
   item.save(err => {
     if (err) {
       console.log(`Error: ${err}`);
@@ -18,13 +18,13 @@ export const newBook = (req, res) => {
 };
 
 /**
- * Get all of the PDSA types in the database.
+ * Get all of the Conferences in the database.
  *
  * @param {*} req
  * @param {*} res
  */
-export const findAllBooks = (req, res) => {
-  Book.find()
+export const findAllConferences = (req, res) => {
+  Conference.find()
     .populate('primarySkillArea')
     .populate('secondarySkillArea')
     .exec((err, items) => {

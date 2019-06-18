@@ -1,7 +1,7 @@
-import Certification from '../database/models/types/certification';
+import Certification from '../../database/models/types/certification';
 
 /**
- * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
+ * Creates a new Certification to store in the DB from the JSON data passed in the req.body.
  *
  * TODO: Add validation that the data being received is correct.
  * @param {*} req the request object
@@ -18,7 +18,7 @@ export const newCertification = (req, res) => {
 };
 
 /**
- * Get all of the PDSA types in the database.
+ * Get all of the Certifications in the database.
  *
  * @param {*} req
  * @param {*} res

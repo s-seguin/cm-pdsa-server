@@ -5,7 +5,7 @@ const Certification = PdsaItem.discriminator(
   'Certification',
   new mongoose.Schema({
     educationInstitution: String,
-    type: String,
+    onlineOrInClass: String,
     ongoing: Boolean
   })
 );
