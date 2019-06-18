@@ -24,11 +24,6 @@ import mongoose from 'mongoose';
  *  reviews: Reviews of the item by prev employess. Includes rating out of 5, review and the user who reviewed it
  *
  *  comments: any additional comments
- *
- *  additionalFields: ### STILL BEING TESTED ### If the PDSA item requires addition fields, for example a Book would have an Author field ex:
- *                    additionalFields: {
- *                       author: "Jane Doe"
- *                    }
  * */
 
 const pdsaItemSchema = mongoose.Schema({
@@ -59,8 +54,7 @@ const pdsaItemSchema = mongoose.Schema({
       reviewedBy: String
     }
   ],
-  comments: String,
-  additionalFields: {}
+  comments: String
 });
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);
