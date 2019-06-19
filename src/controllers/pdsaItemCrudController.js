@@ -18,7 +18,7 @@ import Other from '../database/models/types/other';
 export const create = (req, res) => {
   let item = null;
 
-  switch (req.params.type) {
+  switch (req.params.type.toLowerCase()) {
     case 'book':
       item = new Book(req.body);
       break;
@@ -62,7 +62,7 @@ export const create = (req, res) => {
 export const find = (req, res) => {
   let item = null;
 
-  switch (req.params.type) {
+  switch (req.params.type.toLowerCase()) {
     case 'book':
       item = Book;
       break;
