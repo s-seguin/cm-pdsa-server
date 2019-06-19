@@ -11,12 +11,12 @@ const router = express.Router();
 /**
  * Route to create a new Primary Skill.
  */
-router.post('/new/primary', newPrimarySkill);
+router.post('/create/primary', newPrimarySkill);
 
 /**
  * Route to create a new Secondary Skill.
  */
-router.post('/new/secondary', newSecondarySkill);
+router.post('/create/secondary', newSecondarySkill);
 
 /**
  * Route to return all of the Primary Skills in the database.

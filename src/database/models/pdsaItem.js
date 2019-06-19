@@ -1,12 +1,8 @@
 import mongoose from 'mongoose';
 
 /**
- * This is the main schema to hold PDSA Item Details.
+ * This is the main schema to hold generic PDSA Item Details. Catherine specified the types that are available and we are creating new schemas for the non-generic types.
  * It holds all the common fields that are shared across the PDSA items as per the Excel sheet provided by Catherine.
- *
- *
- * pdsaType: Specifies what type of PDSA item this object is. Ex: Book, Conference, etc.
- *           References PdsaItem Schema, thus the PdsaType you want to reference must already exist in the DB
  *
  * name: The name of the PDSA item, ex: 'Test Book about Development'
  *
@@ -28,20 +24,11 @@ import mongoose from 'mongoose';
  *  reviews: Reviews of the item by prev employess. Includes rating out of 5, review and the user who reviewed it
  *
  *  comments: any additional comments
- *
- *  additionalFields: ### STILL BEING TESTED ### If the PDSA item requires addition fields, for example a Book would have an Author field ex:
- *                    additionalFields: {
- *                       author: "Jane Doe"
- *                    }
  * */
 
 const pdsaItemSchema = mongoose.Schema({
-  pdsaType: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'PdsaType',
-    required: true
-  },
   name: { type: String, required: true },
+  // We include both primarySkillArea and secondarySkillArea (even though secondary has a reference to its primary) to improve query times
   primarySkillArea: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PrimarySkillArea',
@@ -68,8 +55,7 @@ const pdsaItemSchema = mongoose.Schema({
       reviewedBy: String
     }
   ],
-  comments: String,
-  additionalFields: {}
+  comments: String
 });
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);

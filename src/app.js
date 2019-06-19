@@ -2,12 +2,8 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-
-import indexRouter from './routes/index';
+import { indexRouter, skillAreaRouter, pdsaCrudRouter } from './routes/index';
 import usersRouter from './routes/users';
-import pdsaRouter from './routes/pdsa';
-import pdsaTypeRouter from './routes/pdsaType';
-import skillAreaRouter from './routes/skillArea';
 
 const app = express();
 
@@ -19,8 +15,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/users', usersRouter);
 app.use('/skills', skillAreaRouter);
-app.use('/pdsa/type', pdsaTypeRouter);
-app.use('/pdsa', pdsaRouter);
+
+app.use('/pdsa', pdsaCrudRouter);
 
 app.use('/', indexRouter);
 
