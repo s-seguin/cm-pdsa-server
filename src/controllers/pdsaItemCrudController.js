@@ -6,16 +6,20 @@ import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
 
-// A mapping of strings from possible routes to the Models they represent
-const pdsaItemSwitch = {
-  book: Book,
-  subscription: Subscription,
-  certification: Certification,
-  conference: Conference,
-  'course-seminar': CourseSeminar,
-  other: Other,
-  '*': PdsaItem
-};
+/**
+ * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
+ * @param {*} itemName
+ */
+const getPdsaItem = itemName =>
+  ({
+    book: Book,
+    subscription: Subscription,
+    certification: Certification,
+    conference: Conference,
+    'course-seminar': CourseSeminar,
+    other: Other,
+    '*': PdsaItem
+  }[itemName] || null);
 
 /**
  * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
@@ -27,10 +31,10 @@ const pdsaItemSwitch = {
  * @param {*} res the response object
  */
 export const create = (req, res) => {
-  let item = pdsaItemSwitch[req.params.type.toLowerCase()];
+  let item = getPdsaItem(req.params.type.toLowerCase());
 
   // We are a not allowed to create Generic PdsaItems, use type Other instead.
-  if (item !== undefined && item !== PdsaItem) {
+  if (item !== null && item !== PdsaItem) {
     // we need to instantiate a new Object of type determined by the pdsaItemSwitch
     // eslint-disable-next-line new-cap
     item = new item(req.body);
@@ -57,9 +61,9 @@ export const create = (req, res) => {
  * @param {*} res
  */
 export const find = (req, res) => {
-  const item = pdsaItemSwitch[req.params.type.toLowerCase()];
+  const item = getPdsaItem(req.params.type.toLowerCase());
 
-  if (item !== undefined) {
+  if (item !== null) {
     item
       .find()
       .populate('primarySkillArea')
