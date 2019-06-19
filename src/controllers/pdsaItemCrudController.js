@@ -9,7 +9,9 @@ import Other from '../database/models/types/other';
 /**
  * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
  *
- * TODO: Add validation that the data being received is correct.
+ * This is a generic controller that looks at the PDSA type being requested through the url parameters
+ *
+ * TODO: Add validation that the data being received is correct. Will be done in models.
  * @param {*} req the request object
  * @param {*} res the response object
  */
@@ -52,7 +54,7 @@ export const create = (req, res) => {
 };
 
 /**
- * Get all of the PDSA types in the database.
+ * This is a generic find all, allows us to find all the documents of the specified type.
  *
  * @param {*} req
  * @param {*} res
@@ -79,7 +81,7 @@ export const find = (req, res) => {
     case 'other':
       item = Other;
       break;
-    case 'all':
+    case '*':
       item = PdsaItem;
       break;
     default:

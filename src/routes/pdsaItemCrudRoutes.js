@@ -8,6 +8,9 @@ const router = express.Router();
  */
 router.post('/create/:type', create);
 
-router.get('/find/:type', find);
+/**
+ * The route to find the different PDSA items. Logic handled by controller.
+ */
+router.get('/find/all/:type', find);
 
 export default router;
