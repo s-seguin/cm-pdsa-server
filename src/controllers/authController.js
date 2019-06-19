@@ -1,6 +1,5 @@
 import passport from 'passport';
 import OneLoginStrategy from 'passport-openidconnect';
-import session from 'express-session';
 
 require('dotenv').config();
 
@@ -11,6 +10,7 @@ const OIDC_BASE_URI = `https://criticalmass.onelogin.com/oidc`;
 //Configure OpenIDConnect Strategy with the credentials from OneLogin
 // export const configurePassport = (req, res) => {
 passport.use(
+  'openidconnect',
   new OneLoginStrategy(
     {
       issuer: OIDC_BASE_URI,
@@ -22,16 +22,9 @@ passport.use(
       callbackURL: process.env.OIDC_REDIRECT_URI,
       passReqToCallback: true
     },
-    function(req, issuer, userId, profile, accessToken, refreshToken, params, cb) {
-      console.log('issuer:', issuer);
-      console.log('userId:', userId);
-      console.log('accessToken:', accessToken);
-      console.log('refreshToken:', refreshToken);
-      console.log('params:', params);
-
-      req.session.accessToken = accessToken;
-
-      return cb(null, profile);
+    (issuer, sub, profile, accessToken, refreshToken, done) => {
+      console.log('Callback function fired.');
+      return done(null, profile);
     }
   )
 );
@@ -43,3 +36,10 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
+
+export default function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+}

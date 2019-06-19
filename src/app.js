@@ -11,6 +11,7 @@ import pdsaRouter from './routes/pdsa';
 import pdsaTypeRouter from './routes/pdsaType';
 import skillAreaRouter from './routes/skillArea';
 import authRouter from './routes/auth';
+import isAuthenticated from './controllers/authController';
 
 const app = express();
 
@@ -39,6 +40,6 @@ app.use('/pdsa/type', pdsaTypeRouter);
 app.use('/pdsa', pdsaRouter);
 app.use('/login', authRouter);
 
-app.use('/', indexRouter);
+app.use('/', isAuthenticated, indexRouter);
 
 export default app;
