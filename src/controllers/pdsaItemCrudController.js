@@ -10,7 +10,7 @@ import Other from '../database/models/types/other';
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
  * @param {*} itemName
  */
-const getPdsaItem = itemName =>
+const getPdsaItemModel = itemName =>
   ({
     book: Book,
     subscription: Subscription,
@@ -31,15 +31,14 @@ const getPdsaItem = itemName =>
  * @param {*} res the response object
  */
 export const create = (req, res) => {
-  let item = getPdsaItem(req.params.type.toLowerCase());
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
   // We are a not allowed to create Generic PdsaItems, use type Other instead.
-  if (item !== null && item !== PdsaItem) {
+  if (ItemModel !== null && ItemModel !== PdsaItem) {
     // we need to instantiate a new Object of type determined by the pdsaItemSwitch
-    // eslint-disable-next-line new-cap
-    item = new item(req.body);
+    const instantiatedItem = new ItemModel(req.body);
 
-    item.save(err => {
+    instantiatedItem.save(err => {
       if (err) {
         console.log(`Error: ${err}`);
         res.send(`Error: ${err}`);
@@ -47,7 +46,7 @@ export const create = (req, res) => {
     });
   } else {
     res.send(
-      item !== PdsaItem
+      ItemModel !== PdsaItem
         ? `Error: Provided paramter :type was incorrect`
         : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
     );
@@ -61,11 +60,10 @@ export const create = (req, res) => {
  * @param {*} res
  */
 export const find = (req, res) => {
-  const item = getPdsaItem(req.params.type.toLowerCase());
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
-  if (item !== null) {
-    item
-      .find()
+  if (ItemModel !== null) {
+    ItemModel.find()
       .populate('primarySkillArea')
       .populate('secondarySkillArea')
       .exec((err, items) => {
