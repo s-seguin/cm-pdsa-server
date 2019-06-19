@@ -6,6 +6,17 @@ import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
 
+// A mapping of strings from possible routes to the Models they represent
+const pdsaItemSwitch = {
+  book: Book,
+  subscription: Subscription,
+  certification: Certification,
+  conference: Conference,
+  'course-seminar': CourseSeminar,
+  other: Other,
+  '*': PdsaItem
+};
+
 /**
  * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
  *
@@ -16,32 +27,14 @@ import Other from '../database/models/types/other';
  * @param {*} res the response object
  */
 export const create = (req, res) => {
-  let item = null;
+  let item = pdsaItemSwitch[req.params.type.toLowerCase()];
 
-  switch (req.params.type.toLowerCase()) {
-    case 'book':
-      item = new Book(req.body);
-      break;
-    case 'subscription':
-      item = new Subscription(req.body);
-      break;
-    case 'certification':
-      item = new Certification(req.body);
-      break;
-    case 'conference':
-      item = new Conference(req.body);
-      break;
-    case 'course-seminar':
-      item = new CourseSeminar(req.body);
-      break;
-    case 'other':
-      item = new Other(req.body);
-      break;
-    default:
-      item = null;
-      break;
-  }
-  if (item !== null) {
+  // We are a not allowed to create Generic PdsaItems, use type Other instead.
+  if (item !== undefined && item !== PdsaItem) {
+    // we need to instantiate a new Object of type determined by the pdsaItemSwitch
+    // eslint-disable-next-line new-cap
+    item = new item(req.body);
+
     item.save(err => {
       if (err) {
         console.log(`Error: ${err}`);
@@ -49,7 +42,11 @@ export const create = (req, res) => {
       } else res.sendStatus(200);
     });
   } else {
-    res.send(`Error: Provided paramter :type was incorrect`);
+    res.send(
+      item !== PdsaItem
+        ? `Error: Provided paramter :type was incorrect`
+        : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
+    );
   }
 };
 
@@ -60,35 +57,9 @@ export const create = (req, res) => {
  * @param {*} res
  */
 export const find = (req, res) => {
-  let item = null;
+  const item = pdsaItemSwitch[req.params.type.toLowerCase()];
 
-  switch (req.params.type.toLowerCase()) {
-    case 'book':
-      item = Book;
-      break;
-    case 'subscription':
-      item = Subscription;
-      break;
-    case 'certification':
-      item = Certification;
-      break;
-    case 'conference':
-      item = Conference;
-      break;
-    case 'course-seminar':
-      item = CourseSeminar;
-      break;
-    case 'other':
-      item = Other;
-      break;
-    case '*':
-      item = PdsaItem;
-      break;
-    default:
-      item = null;
-      break;
-  }
-  if (item !== null) {
+  if (item !== undefined) {
     item
       .find()
       .populate('primarySkillArea')
