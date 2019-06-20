@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import PdsaItem from '../pdsaItem';
+import { deliveryMethodValidator } from '../validation';
 
 /**
  * This is the schema to hold a conference PDSA item in the database.
@@ -18,8 +19,12 @@ import PdsaItem from '../pdsaItem';
 const Conference = PdsaItem.discriminator(
   'Conference',
   new mongoose.Schema({
-    educationalInstitution: String,
-    deliveryMethod: String,
+    institution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Institution',
+      required: false
+    },
+    deliveryMethod: { type: String, validate: deliveryMethodValidator },
     location: String,
     notableDates: { start: Date, end: Date, otherDates: [Date] },
     ongoing: Boolean

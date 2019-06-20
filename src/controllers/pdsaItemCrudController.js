@@ -5,6 +5,10 @@ import Certification from '../database/models/types/certification';
 import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
+import PrimarySkillArea from '../database/models/primarySkillArea';
+import SecondarySkillArea from '../database/models/secondarySkillArea';
+import Institution from '../database/models/institution';
+import Program from '../database/models/program';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
@@ -18,7 +22,11 @@ const getPdsaItemModel = itemName =>
     conference: Conference,
     'course-seminar': CourseSeminar,
     other: Other,
-    '*': PdsaItem
+    'pdsa-item': PdsaItem,
+    'primary-skill': PrimarySkillArea,
+    'secondary-skill': SecondarySkillArea,
+    institution: Institution,
+    program: Program
   }[itemName] || null);
 
 /**

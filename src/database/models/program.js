@@ -5,10 +5,15 @@ import mongoose from 'mongoose';
  *
  * Primary and Secondary skills appear to be two separate list thus the two separate schemas.
  */
-const primarySkillAreaSchema = mongoose.Schema({
-  name: { type: String, required: true, unique: true }
+const programSchema = mongoose.Schema({
+  name: { type: String, required: true },
+  institution: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Institution',
+    required: true
+  }
 });
 
-const PrimarySkillArea = mongoose.model('PrimarySkillArea', primarySkillAreaSchema);
+const Program = mongoose.model('Program', programSchema);
 
-export default PrimarySkillArea;
+export default Program;

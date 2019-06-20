@@ -7,5 +7,4 @@ export const indexRouter = router.get('/*', (req, res) => {
   res.send('This is PDSA backend API.');
 });
 
-export { default as skillAreaRouter } from './skillArea';
 export { default as pdsaCrudRouter } from './pdsaItemCrudRoutes';

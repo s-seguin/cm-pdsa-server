@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import PdsaItem from '../pdsaItem';
+import { deliveryMethodValidator } from '../validation';
 
 /**
  * This is the schema to hold a certification PDSA item in the database.
@@ -16,8 +17,12 @@ import PdsaItem from '../pdsaItem';
 const Certification = PdsaItem.discriminator(
   'Certification',
   new mongoose.Schema({
-    educationInstitution: String,
-    deliveryMethod: String, // 'Online', 'InClass', 'Both'
+    institution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Institution',
+      required: false
+    },
+    deliveryMethod: { type: String, validate: deliveryMethodValidator }, // 'Online', 'InClass', 'Both'
     location: String,
     ongoing: Boolean
   })

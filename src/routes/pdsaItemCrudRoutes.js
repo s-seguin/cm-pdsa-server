@@ -13,4 +13,10 @@ router.post('/create/:type', create);
  */
 router.get('/find/all/:type', find);
 
+// router.get('/find/children/:id', findAllSecondarySkills);
+
+// router.get('/find/unique/:type/:id');
+
+// router.get('/find/matching/:type/:name')
+
 export default router;
