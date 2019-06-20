@@ -21,8 +21,7 @@ export const pdsaTierValidator = [
   },
   'Invalid PDSA Tier. PDSA Tier must be one of the following: 1,2,3,4.'
 ];
-
-const currencyCodes = ['CAD', 'USD', 'EUR', 'GBP', 'HKD', 'CRC'];
+const currencyCodes = ['CAD', 'USD', 'EUR', 'GBP', 'HKD', 'CRC', 'BRL', 'JPY'];
 const validCurrencyCodeValidator = cost => {
   if (!currencyCodes.includes(cost.currency)) return false;
   return true;

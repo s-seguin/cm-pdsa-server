@@ -74,3 +74,43 @@ export const findMetadata = (req, res) => {
     res.send(`Error: Provided paramter :type was incorrect`);
   }
 };
+
+/**
+ * Delete the Metadata Item specified in req.params.type with id = req.params.id
+ *
+ * Does not check if anything uses this Metadata item before deleting.
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+export const unsafeDeleteMetadataById = (req, res) => {
+  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    ItemModel.deleteOne({ _id: req.params.id }, (err, items) => {
+      if (err) return res.send(`Error: ${err}`);
+      return res.send(items);
+    });
+  } else {
+    res.send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * Delete the Metadata Item specified in req.params.type with id = req.params.id
+ *
+ * Does not check if anything uses this Metadata item before deleting.
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+export const unsafeDeleteMetadataByName = (req, res) => {
+  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    ItemModel.deleteOne({ name: req.params.name }, (err, items) => {
+      if (err) return res.send(`Error: ${err}`);
+      return res.send(items);
+    });
+  } else {
+    res.send(`Error: Provided paramter :type was incorrect`);
+  }
+};

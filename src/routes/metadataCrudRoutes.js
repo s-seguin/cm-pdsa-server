@@ -1,5 +1,10 @@
 import express from 'express';
-import { createMetadata, findMetadata } from '../controllers/metadataCrudController';
+import {
+  createMetadata,
+  findMetadata,
+  unsafeDeleteMetadataById,
+  unsafeDeleteMetadataByName
+} from '../controllers/metadataCrudController';
 
 const router = express.Router();
 
@@ -7,6 +12,10 @@ const router = express.Router();
  * The route to create a new PDSA item. Creation handled by controller.
  */
 router.post('/create/:type', createMetadata);
+
+router.delete('/delete/:type/id/:id', unsafeDeleteMetadataById);
+
+router.delete('/delete/:type/name/:name', unsafeDeleteMetadataByName);
 
 /**
  * The route to find the different PDSA items. Logic handled by controller.
