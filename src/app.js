@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import { indexRouter, pdsaCrudRouter } from './routes/index';
+import { indexRouter, pdsaCrudRouter, metadataCrudRouter } from './routes/index';
 import usersRouter from './routes/users';
 
 const app = express();
@@ -16,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 
 app.use('/pdsa', pdsaCrudRouter);
+app.use('/metadata', metadataCrudRouter);
 
 app.use('/', indexRouter);
 

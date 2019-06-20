@@ -8,3 +8,4 @@ export const indexRouter = router.get('/*', (req, res) => {
 });
 
 export { default as pdsaCrudRouter } from './pdsaItemCrudRoutes';
+export { default as metadataCrudRouter } from './metadataCrudRoutes';

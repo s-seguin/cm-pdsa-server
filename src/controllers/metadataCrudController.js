@@ -1,24 +1,19 @@
 import PdsaItem from '../database/models/pdsaItem';
-import Book from '../database/models/types/book';
-import Subscription from '../database/models/types/subscription';
-import Certification from '../database/models/types/certification';
-import Conference from '../database/models/types/conference';
-import CourseSeminar from '../database/models/types/courseSeminar';
-import Other from '../database/models/types/other';
+import PrimarySkillArea from '../database/models/metadata/primarySkillArea';
+import SecondarySkillArea from '../database/models/metadata/secondarySkillArea';
+import Institution from '../database/models/metadata/institution';
+import Program from '../database/models/metadata/program';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
  * @param {*} itemName
  */
-const getPdsaItemModel = itemName =>
+const getMetadataModel = itemName =>
   ({
-    book: Book,
-    subscription: Subscription,
-    certification: Certification,
-    conference: Conference,
-    'course-seminar': CourseSeminar,
-    other: Other,
-    '*': PdsaItem
+    'primary-skill': PrimarySkillArea,
+    'secondary-skill': SecondarySkillArea,
+    institution: Institution,
+    program: Program
   }[itemName] || null);
 
 /**
@@ -30,8 +25,8 @@ const getPdsaItemModel = itemName =>
  * @param {*} req the request object
  * @param {*} res the response object
  */
-export const create = (req, res) => {
-  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+export const createMetadata = (req, res) => {
+  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
 
   // We are a not allowed to create Generic PdsaItems, use type Other instead.
   if (ItemModel !== null && ItemModel !== PdsaItem) {
@@ -59,8 +54,8 @@ export const create = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-export const find = (req, res) => {
-  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+export const findMetadata = (req, res) => {
+  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
 
   if (ItemModel !== null) {
     ItemModel.find()

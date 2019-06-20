@@ -4,15 +4,11 @@
  */
 export const deliveryMethodValidator = [
   deliverMethod => {
-    if (['Online', 'InClass', 'Both'].includes(deliverMethod)) return false;
+    if (['online', 'in-class', 'both'].includes(deliverMethod)) return false;
     return true;
   },
   'Invalid delivery method. Delivery Method can be Online, InClass or Both'
 ];
-
-// ////////// //
-// Validation //
-// ////////// //
 
 /** Custom validator to ensure PDSA Tier is a number between 1-4
  * [0] -> the function to validate the pdsaTier
@@ -42,6 +38,9 @@ const minCostLessThanMaxCostValidator = cost => {
   return true;
 };
 
+/**
+ * A group of validators to check the cost object of a PDSA item
+ */
 export const costValidator = [
   { validator: costGreaterThanZeroValidator, msg: 'The cost of an item cannot be less than 0.' },
   {
