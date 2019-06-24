@@ -59,7 +59,7 @@ export const findMetadata = (req, res) => {
 
   if (ItemModel !== null) {
     ItemModel.find()
-      // .populate('primarySkillArea')
+      .populate('parentPrimarySkillArea')
       .populate({
         path: 'secondarySkillArea',
         populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
@@ -78,37 +78,28 @@ export const findMetadata = (req, res) => {
 /**
  * Delete the Metadata Item specified in req.params.type with id = req.params.id
  *
- * Does not check if anything uses this Metadata item before deleting.
+ * If the Model we are deleting has a pre 'remove' hook, it will check if specified model has any children that also need to be removed.
  *
  * @param {*} req
  * @param {*} res
  */
-export const unsafeDeleteMetadataById = (req, res) => {
+export const deleteMetadataById = (req, res) => {
   const ItemModel = getMetadataModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
-    ItemModel.deleteOne({ _id: req.params.id }, (err, items) => {
+    // Find the item we want to delete
+    ItemModel.findById(req.params.id, async (err, items) => {
       if (err) return res.send(`Error: ${err}`);
-      return res.send(items);
-    });
-  } else {
-    res.send(`Error: Provided paramter :type was incorrect`);
-  }
-};
-
-/**
- * Delete the Metadata Item specified in req.params.type with id = req.params.id
- *
- * Does not check if anything uses this Metadata item before deleting.
- *
- * @param {*} req
- * @param {*} res
- */
-export const unsafeDeleteMetadataByName = (req, res) => {
-  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
-  if (ItemModel !== null) {
-    ItemModel.deleteOne({ name: req.params.name }, (err, items) => {
-      if (err) return res.send(`Error: ${err}`);
-      return res.send(items);
+      try {
+        // If we find an item with a matching ID, remove it so that the pre 'remove' hook will be called in the model
+        const delRes = await items.remove();
+        const r = {
+          deletedCount: 1,
+          deletedObject: delRes
+        };
+        return res.send(r);
+      } catch (e) {
+        return res.send(`Error: ${e}`);
+      }
     });
   } else {
     res.send(`Error: Provided paramter :type was incorrect`);
