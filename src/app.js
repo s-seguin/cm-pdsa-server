@@ -41,7 +41,6 @@ app.use('/pdsa', pdsaRouter);
 //Authorization Routes
 app.use('/auth', authRouter);
 app.use('/login', authRouter);
-app.use('/logout', isAuthenticated, authRouter);
 
 app.use('/', isAuthenticated, indexRouter);
 

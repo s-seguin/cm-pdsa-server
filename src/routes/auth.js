@@ -5,9 +5,7 @@ import { setupPassport, logout } from '../controllers/authController';
 require('https').globalAgent.options.rejectUnauthorized = false;
 require('dotenv').config();
 
-const request = require('request');
 const router = express.Router();
-var http = require('http');
 
 //Initialize passport and create openidconnect strategy
 setupPassport();
@@ -32,6 +30,7 @@ router.get(
   }
 );
 
+//Fallback to login when invalid path is entered
 router.get('/', (req, res) => {
   res.redirect('/auth/login');
 });
