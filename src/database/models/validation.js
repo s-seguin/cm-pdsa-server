@@ -36,7 +36,7 @@ const currencyCodes = ['CAD', 'USD', 'EUR', 'GBP', 'HKD', 'CRC', 'BRL', 'JPY'];
 
 /**
  * Checks if the currency specified in the Cost is a valid currency code specified above
- * @param {*} cost the cost object to check
+ * @param {Cost} cost the cost object to check
  */
 const validCurrencyCodeValidator = cost => {
   if (!currencyCodes.includes(cost.currency)) return false;
@@ -45,7 +45,7 @@ const validCurrencyCodeValidator = cost => {
 
 /**
  * Checks that both the min cost and max cost are greater than zero
- * @param {*} cost
+ * @param {Cost} cost the cost object to check
  */
 const costGreaterThanZeroValidator = cost => {
   if (cost.minCost < 0 || cost.maxCost < 0) return false;
@@ -54,7 +54,7 @@ const costGreaterThanZeroValidator = cost => {
 
 /**
  * Checks that the min cost is less than the max cost
- * @param {*} cost
+ * @param {Cost} cost the cost object to check
  */
 const minCostLessThanMaxCostValidator = cost => {
   if (cost.maxCost < cost.minCost) return false;

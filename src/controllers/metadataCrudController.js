@@ -6,7 +6,7 @@ import Program from '../database/models/metadata/program';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
- * @param {*} itemName
+ * @param {String} itemName
  */
 const getMetadataModel = itemName =>
   ({
@@ -22,8 +22,8 @@ const getMetadataModel = itemName =>
  * This is a generic controller that looks at the PDSA type being requested through the url parameters
  *
  * TODO: Add validation that the data being received is correct. Will be done in models.
- * @param {*} req the request object
- * @param {*} res the response object
+ * @param {Request} req the request object
+ * @param {Response} res the response object
  */
 export const createMetadata = (req, res) => {
   const ItemModel = getMetadataModel(req.params.type.toLowerCase());
@@ -51,8 +51,8 @@ export const createMetadata = (req, res) => {
 /**
  * This is a generic find all, allows us to find all the documents of the specified type.
  *
- * @param {*} req
- * @param {*} res
+ * @param {Request} req the request object
+ * @param {Response} res the response object
  */
 export const findMetadata = (req, res) => {
   const ItemModel = getMetadataModel(req.params.type.toLowerCase());
@@ -82,8 +82,8 @@ export const findMetadata = (req, res) => {
  *
  * Returns the item we deleted. Does not return information about any children items we have deleted.
  *
- * @param {*} req the req object, req.params.id is the id of the object we want to delete
- * @param {*} res the result object that we return to the client
+ * @param {Request} req the req object, req.params.id is the id of the object we want to delete
+ * @param {Response} res the result object that we return to the client
  */
 export const deleteMetadataById = (req, res) => {
   const ItemModel = getMetadataModel(req.params.type.toLowerCase());

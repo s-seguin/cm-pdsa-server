@@ -22,7 +22,7 @@ import { pdsaTierValidator, costValidator } from './validation';
  *
  *  previousAttendees: A list of the names of previous CM employees that attended / bought
  *
- *  reviews: Reviews of the item by prev employess. Includes rating out of 5, review and the user who reviewed it
+ *  reviews: Reviews of the item by prev employees. Includes rating out of 5, review and the user who reviewed it
  *
  *  comments: any additional comments
  * */
