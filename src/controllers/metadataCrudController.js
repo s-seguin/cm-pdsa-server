@@ -1,11 +1,10 @@
-import PdsaItem from '../database/models/pdsaItem';
 import PrimarySkillArea from '../database/models/metadata/primarySkillArea';
 import SecondarySkillArea from '../database/models/metadata/secondarySkillArea';
 import Institution from '../database/models/metadata/institution';
 import Program from '../database/models/metadata/program';
 
 /**
- * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
+ * Return the matching Model from the provided itemName, if it doesn't match anything return null
  * @param {String} itemName
  */
 const getMetadataModel = itemName =>
@@ -26,12 +25,11 @@ const getMetadataModel = itemName =>
  * @param {Response} res the response object
  */
 export const createMetadata = (req, res) => {
-  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
 
-  // We are a not allowed to create Generic PdsaItems, use type Other instead.
-  if (ItemModel !== null && ItemModel !== PdsaItem) {
-    // we need to instantiate a new Object of type determined by the pdsaItemSwitch
-    const instantiatedItem = new ItemModel(req.body);
+  if (MetadataModel !== null) {
+    // we need to instantiate a new Object of type determined by getMetadataModel
+    const instantiatedItem = new MetadataModel(req.body);
 
     instantiatedItem.save(err => {
       if (err) {
@@ -40,11 +38,7 @@ export const createMetadata = (req, res) => {
       } else res.sendStatus(200);
     });
   } else {
-    res.send(
-      ItemModel !== PdsaItem
-        ? `Error: Provided paramter :type was incorrect`
-        : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
-    );
+    res.send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -55,10 +49,10 @@ export const createMetadata = (req, res) => {
  * @param {Response} res the response object
  */
 export const findMetadata = (req, res) => {
-  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
 
-  if (ItemModel !== null) {
-    ItemModel.find()
+  if (MetadataModel !== null) {
+    MetadataModel.find()
       .populate('parentPrimarySkillArea')
       .populate({
         path: 'secondarySkillArea',
