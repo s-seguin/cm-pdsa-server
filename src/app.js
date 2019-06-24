@@ -7,7 +7,7 @@ import session from 'express-session';
 
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
-import isAuthenticated from './controllers/authController';
+import { isAuthenticated } from './controllers/authController';
 import { indexRouter, skillAreaRouter, pdsaCrudRouter } from './routes/index';
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Setup session for passport and OneLogin authentication
+// Setup session for passport and OneLogin authentication
 app.use(
   session({
     secret: 'fat cats eating giant shrimp',
@@ -27,14 +27,14 @@ app.use(
   })
 );
 
-//Initialize Passport
+// Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/users', usersRouter);
-app.use('/skills', skillAreaRouter);
+app.use('/skills', isAuthenticated, skillAreaRouter);
 
-//Authorization Routes
+// Authorization Routes
 app.use('/auth', authRouter);
 app.use('/login', authRouter);
 

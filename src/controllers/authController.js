@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const router = express.Router();
 const http = require('http');
+
 const OIDC_BASE_URI = `https://openid-connect.onelogin.com/oidc`;
 
 /**
@@ -31,8 +32,9 @@ export function setupPassport() {
         callbackURL: process.env.OIDC_REDIRECT_URI,
         scope: 'profile'
       },
-      function(issuer, sub, profile, jwtClaims, accessToken, refereshToken, tokenResponse, done) {
+      (issuer, sub, profile, jwtClaims, accessToken, refereshToken, tokenResponse, done) => {
         done(null, {
+          // eslint-disable-next-line object-shorthand
           profile: profile,
           accessToken: {
             token: accessToken,
@@ -49,13 +51,13 @@ export function setupPassport() {
     )
   );
 
-  //Used to serialize user to session object
-  passport.serializeUser(function(user, done) {
+  // Used to serialize user to session object
+  passport.serializeUser((user, done) => {
     done(null, user);
   });
 
-  //Used to de-serialize user from session object
-  passport.deserializeUser(function(obj, done) {
+  // Used to de-serialize user from session object
+  passport.deserializeUser((obj, done) => {
     done(null, obj);
   });
 }
@@ -72,7 +74,7 @@ export function isAuthenticated(req, res, next) {
   if (req.isAuthenticated() && typeof req.user !== 'undefined') {
     return next();
   }
-  res.redirect('/auth/login');
+  return res.redirect('/auth/login');
 }
 
 /**
@@ -90,34 +92,34 @@ export function logout(req, res) {
     res.redirect('/');
   }
 
-  //Setting the header for the POST request to OneLogin
+  // Setting the header for the POST request to OneLogin
   const options = {
     host: 'openid-connect.onelogin.com',
     path: '/oidc/token/revocation',
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: new Buffer(
+      Authorization: Buffer.from(
         `${process.env.OIDC_CLIENT_ID}:${process.env.OIDC_CLIENT_SECRET}`
       ).toString('base64')
     }
   };
 
-  //Creating the request using options and handling the information returned from POST request
-  let request = http.request(options, function(response) {
+  // Creating the request using options and handling the information returned from POST request
+  const request = http.request(options, response => {
     let responseString = '';
-    //Save all the data from the response
-    response.on('data', function(data) {
+    // Save all the data from the response
+    response.on('data', data => {
       responseString += data;
     });
-    //Log information from request when request is completed
-    response.on('end', function() {
-      console.log('Logout POST Response String: ' + responseString);
+    // Log information from request when request is completed
+    response.on('end', () => {
+      console.log(`Logout POST Response String: ${responseString}`);
     });
   });
-  //Create body information with access_token
-  let requestBody = `token=${req.session.passport.user.accessToken.token}&token_type_hint=access_token`;
-  //Submit the request
+  // Create body information with access_token
+  const requestBody = `token=${req.session.passport.user.accessToken.token}&token_type_hint=access_token`;
+  // Submit the request
   request.write(requestBody);
   request.end();
   req.logout();
