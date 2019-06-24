@@ -93,7 +93,7 @@ export const deleteMetadataById = (req, res) => {
       if (err) return res.send(`Error: ${err}`);
       try {
         // If we find an item with a matching ID, remove it so that the pre 'remove' hook will be called in the model
-        res.send(await items.remove());
+        return res.send(await items.remove());
       } catch (e) {
         return res.send(`Error: ${e}`);
       }
