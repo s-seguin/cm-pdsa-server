@@ -2,8 +2,13 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import { indexRouter, skillAreaRouter, pdsaCrudRouter } from './routes/index';
+import passport from 'passport';
+import session from 'express-session';
+
 import usersRouter from './routes/users';
+import authRouter from './routes/auth';
+import isAuthenticated from './controllers/authController';
+import { indexRouter, skillAreaRouter, pdsaCrudRouter } from './routes/index';
 
 const app = express();
 
@@ -13,11 +18,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Setup session for passport and OneLogin authentication
+app.use(
+  session({
+    secret: 'fat cats eating giant shrimp',
+    resave: false,
+    saveUninitialized: true
+  })
+);
+
+//Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/users', usersRouter);
 app.use('/skills', skillAreaRouter);
 
+//Authorization Routes
+app.use('/auth', authRouter);
+app.use('/login', authRouter);
+
 app.use('/pdsa', pdsaCrudRouter);
 
-app.use('/', indexRouter);
+app.use('/', isAuthenticated, indexRouter);
 
 export default app;
