@@ -7,7 +7,7 @@ import session from 'express-session';
 
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
-import isAuthenticated from './controllers/authController';
+import { isAuthenticated } from './controllers/authController';
 import { indexRouter, pdsaCrudRouter, metadataCrudRouter } from './routes/index';
 
 const app = express();
