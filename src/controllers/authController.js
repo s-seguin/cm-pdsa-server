@@ -14,8 +14,8 @@ const OIDC_BASE_URI = `https://openid-connect.onelogin.com/oidc`;
  *
  * Setup methods to serialize and de-serialize the user object from/to session.
  *
- * @param {*} req the request object
- * @param {*} res the response object
+ * @param {Request} req the request object
+ * @param {Response} res the response object
  */
 export function setupPassport() {
   passport.use(
@@ -64,9 +64,9 @@ export function setupPassport() {
  * Check if a user is authenticated with OneLogin and redirect to appropriate page.
  * Users that are not logged in will be sent to /login
  *
- * @param {*} req the request object
- * @param {*} res the response object
- * @param {*} next the next object
+ * @param {Request} req the request object
+ * @param {Response} res the response object
+ * @param {Object} next the next object
  */
 export function isAuthenticated(req, res, next) {
   if (req.isAuthenticated() && typeof req.user !== 'undefined') {
@@ -82,8 +82,8 @@ export function isAuthenticated(req, res, next) {
  * Method creates a POST request to `https://openid-connect.onelogin.com/oidc/token/revocation` by passing the
  * user access_token to revoke the token from all OneLogin applications.
  *
- * @param {*} req the request object
- * @param {*} res the response object
+ * @param {Request} req the request object
+ * @param {Response} res the response object
  */
 export function logout(req, res) {
   if (typeof req.user === 'undefined') {
@@ -91,7 +91,7 @@ export function logout(req, res) {
   }
 
   //Setting the header for the POST request to OneLogin
-  var options = {
+  const options = {
     host: 'openid-connect.onelogin.com',
     path: '/oidc/token/revocation',
     method: 'POST',
@@ -104,8 +104,8 @@ export function logout(req, res) {
   };
 
   //Creating the request using options and handling the information returned from POST request
-  var request = http.request(options, function(response) {
-    var responseString = '';
+  let request = http.request(options, function(response) {
+    let responseString = '';
     //Save all the data from the response
     response.on('data', function(data) {
       responseString += data;
@@ -116,7 +116,7 @@ export function logout(req, res) {
     });
   });
   //Create body information with access_token
-  var requestBody = `token=${req.session.passport.user.accessToken.token}&token_type_hint=access_token`;
+  let requestBody = `token=${req.session.passport.user.accessToken.token}&token_type_hint=access_token`;
   //Submit the request
   request.write(requestBody);
   request.end();
