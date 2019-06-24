@@ -24,13 +24,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Setup session for passport and OneLogin authentication
 app.use(
   session({
-    secret: 'secret squirrel',
+    secret: 'fat cats eating giant shrimp',
     resave: false,
     saveUninitialized: true
   })
 );
 
-// Initialize Passport
+//Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -38,7 +38,10 @@ app.use('/users', usersRouter);
 app.use('/skills', skillAreaRouter);
 app.use('/pdsa/type', pdsaTypeRouter);
 app.use('/pdsa', pdsaRouter);
+//Authorization Routes
+app.use('/auth', authRouter);
 app.use('/login', authRouter);
+app.use('/logout', isAuthenticated, authRouter);
 
 app.use('/', isAuthenticated, indexRouter);
 

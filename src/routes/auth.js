@@ -1,42 +1,39 @@
 import express from 'express';
 import passport from 'passport';
-import request from 'request';
-import isAuthenticated from '../controllers/authController';
-import { equal } from 'assert';
+import { setupPassport, logout } from '../controllers/authController';
 
-require('../controllers/authController');
+require('https').globalAgent.options.rejectUnauthorized = false;
 require('dotenv').config();
 
+const request = require('request');
 const router = express.Router();
+var http = require('http');
 
-//Request for authentication using openidconnect strategy
+//Initialize passport and create openidconnect strategy
+setupPassport();
+
+//Request for authentication using openidconnect strategy for OneLogin
 router.get(
-  '/',
+  '/login',
   passport.authenticate('openidconnect', {
     scope: 'profile'
   })
 );
 
-//Fetch user information from OneLogin
-router.use(
+//Logout user and destroy OneLogin session.
+router.get('/logout', logout);
+
+//Fetch user information from OneLogin when callback function is triggered and user is logged in
+router.get(
   '/callback',
-  passport.authenticate('openidconnect', { failureRedirect: '/error' }),
+  passport.authenticate('openidconnect', { failureRedirect: '/auth/login' }),
   (req, res) => {
     res.redirect('/');
   }
 );
 
-//Profile page for user info
-router.use('/profile', (req, res) => {
-  res.send('Profile<br/> ' + req.user.displayName);
-});
-
-// Destroy both the local session and
-// revoke the access_token at OneLogin
-router.get('/logout', (req, res) => {
-  req.logout();
-  req.session.destroy();
-  res.redirect('/');
+router.get('/', (req, res) => {
+  res.redirect('/auth/login');
 });
 
 export default router;
