@@ -1,9 +1,10 @@
+import express from 'express';
 import passport from 'passport';
 import OneLoginStrategy from 'passport-openidconnect';
-import router from '../routes/pdsaType';
 
 require('dotenv').config();
 
+const router = express.Router();
 const http = require('http');
 const OIDC_BASE_URI = `https://openid-connect.onelogin.com/oidc`;
 

@@ -5,13 +5,10 @@ import logger from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
 
-import indexRouter from './routes/index';
 import usersRouter from './routes/users';
-import pdsaRouter from './routes/pdsa';
-import pdsaTypeRouter from './routes/pdsaType';
-import skillAreaRouter from './routes/skillArea';
 import authRouter from './routes/auth';
 import isAuthenticated from './controllers/authController';
+import { indexRouter, skillAreaRouter, pdsaCrudRouter } from './routes/index';
 
 const app = express();
 
@@ -36,11 +33,12 @@ app.use(passport.session());
 
 app.use('/users', usersRouter);
 app.use('/skills', skillAreaRouter);
-app.use('/pdsa/type', pdsaTypeRouter);
-app.use('/pdsa', pdsaRouter);
+
 //Authorization Routes
 app.use('/auth', authRouter);
 app.use('/login', authRouter);
+
+app.use('/pdsa', pdsaCrudRouter);
 
 app.use('/', isAuthenticated, indexRouter);
 
