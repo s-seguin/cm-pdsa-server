@@ -64,8 +64,13 @@ export const find = (req, res) => {
 
   if (ItemModel !== null) {
     ItemModel.find()
-      .populate('primarySkillArea')
-      .populate('secondarySkillArea')
+      // .populate('primarySkillArea')
+      .populate({
+        path: 'secondarySkillArea',
+        populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+      })
+      .populate('institution')
+      .populate('program')
       .exec((err, items) => {
         if (err) return res.send(`Error: ${err}`);
         return res.send(items);

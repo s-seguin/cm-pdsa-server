@@ -1,17 +1,23 @@
 import express from 'express';
-import { create, find } from '../controllers/pdsaItemCrudController';
+import {
+  createMetadata,
+  findMetadata,
+  deleteMetadataById
+} from '../controllers/metadataCrudController';
 
 const router = express.Router();
 
 /**
  * The route to create a new PDSA item. Creation handled by controller.
  */
-router.post('/create/:type', create);
+router.post('/create/:type', createMetadata);
+
+router.delete('/delete/:type/id/:id', deleteMetadataById);
 
 /**
  * The route to find the different PDSA items. Logic handled by controller.
  */
-router.get('/find/all/:type', find);
+router.get('/find/all/:type', findMetadata);
 
 // router.get('/find/children/:id', findAllSecondarySkills);
 

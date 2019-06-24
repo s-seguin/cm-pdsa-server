@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { pdsaTierValidator, costValidator } from './validation';
 
 /**
  * This is the main schema to hold generic PDSA Item Details. Catherine specified the types that are available and we are creating new schemas for the non-generic types.
@@ -21,7 +22,7 @@ import mongoose from 'mongoose';
  *
  *  previousAttendees: A list of the names of previous CM employees that attended / bought
  *
- *  reviews: Reviews of the item by prev employess. Includes rating out of 5, review and the user who reviewed it
+ *  reviews: Reviews of the item by prev employees. Includes rating out of 5, review and the user who reviewed it
  *
  *  comments: any additional comments
  * */
@@ -40,12 +41,16 @@ const pdsaItemSchema = mongoose.Schema({
     required: true
   },
   url: { type: String, required: true },
-  startingPdsaTier: { type: Number, required: true },
+  startingPdsaTier: { type: Number, required: true, validate: pdsaTierValidator },
   cost: {
-    currency: { type: String, required: true },
-    minCost: { type: Number, required: true },
-    maxCost: { type: Number, required: true },
-    groupPricingAvailable: { type: Boolean, required: true }
+    type: {
+      currency: { type: String, required: true },
+      minCost: { type: Number, required: true },
+      maxCost: { type: Number, required: true },
+      groupPricingAvailable: { type: Boolean, required: true }
+    },
+    required: true,
+    validate: costValidator
   },
   previousAttendees: [String],
   reviews: [

@@ -8,7 +8,7 @@ import session from 'express-session';
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 import { isAuthenticated } from './controllers/authController';
-import { indexRouter, skillAreaRouter, pdsaCrudRouter } from './routes/index';
+import { indexRouter, pdsaCrudRouter, metadataCrudRouter } from './routes/index';
 
 const app = express();
 
@@ -32,13 +32,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/users', usersRouter);
-app.use('/skills', isAuthenticated, skillAreaRouter);
 
 // Authorization Routes
 app.use('/auth', authRouter);
 app.use('/login', authRouter);
 
-app.use('/pdsa', pdsaCrudRouter);
+app.use('/pdsa', isAuthenticated, pdsaCrudRouter);
+app.use('/metadata', isAuthenticated, metadataCrudRouter);
 
 app.use('/', isAuthenticated, indexRouter);
 

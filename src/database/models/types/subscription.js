@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import PdsaItem from '../pdsaItem';
+import { deliveryMethodValidator } from '../validation';
 
 /**
  * This is the schema to hold a subscription PDSA item in the database.
@@ -16,8 +17,12 @@ import PdsaItem from '../pdsaItem';
 const Subscription = PdsaItem.discriminator(
   'Subscription',
   new mongoose.Schema({
-    educationalInstitution: String,
-    deliveryMethod: String,
+    institution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Institution',
+      required: false
+    },
+    deliveryMethod: { type: String, validate: deliveryMethodValidator },
     duration: String,
     ongoing: Boolean
   })
