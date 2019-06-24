@@ -7,10 +7,10 @@ require('dotenv').config();
 
 const router = express.Router();
 
-//Initialize passport and create openidconnect strategy
+// Initialize passport and create openidconnect strategy
 setupPassport();
 
-//Request for authentication using openidconnect strategy for OneLogin
+// Request for authentication using openidconnect strategy for OneLogin
 router.get(
   '/login',
   passport.authenticate('openidconnect', {
@@ -18,10 +18,10 @@ router.get(
   })
 );
 
-//Logout user and destroy OneLogin session.
+// Logout user and destroy OneLogin session.
 router.get('/logout', logout);
 
-//Fetch user information from OneLogin when callback function is triggered and user is logged in
+// Fetch user information from OneLogin when callback function is triggered and user is logged in
 router.get(
   '/callback',
   passport.authenticate('openidconnect', { failureRedirect: '/auth/login' }),
@@ -30,7 +30,7 @@ router.get(
   }
 );
 
-//Fallback to login when invalid path is entered
+// Fallback to login when invalid path is entered
 router.get('/', (req, res) => {
   res.redirect('/auth/login');
 });
