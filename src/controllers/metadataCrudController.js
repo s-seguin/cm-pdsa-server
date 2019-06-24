@@ -80,8 +80,10 @@ export const findMetadata = (req, res) => {
  *
  * If the Model we are deleting has a pre 'remove' hook, it will check if specified model has any children that also need to be removed.
  *
- * @param {*} req
- * @param {*} res
+ * Returns the item we deleted. Does not return information about any children items we have deleted.
+ *
+ * @param {*} req the req object, req.params.id is the id of the object we want to delete
+ * @param {*} res the result object that we return to the client
  */
 export const deleteMetadataById = (req, res) => {
   const ItemModel = getMetadataModel(req.params.type.toLowerCase());
@@ -91,12 +93,7 @@ export const deleteMetadataById = (req, res) => {
       if (err) return res.send(`Error: ${err}`);
       try {
         // If we find an item with a matching ID, remove it so that the pre 'remove' hook will be called in the model
-        const delRes = await items.remove();
-        const r = {
-          deletedCount: 1,
-          deletedObject: delRes
-        };
-        return res.send(r);
+        res.send(await items.remove());
       } catch (e) {
         return res.send(`Error: ${e}`);
       }

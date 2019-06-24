@@ -14,6 +14,24 @@ const secondarySkillAreaSchema = mongoose.Schema({
   }
 });
 
+/**
+ * Check if there exists a SecondarySkillArea with the same name and parentPrimarySkillArea
+ */
+secondarySkillAreaSchema.pre('save', async function ensureUnique(next) {
+  // we need to disable this rule because the hooks need to be defined before our model is created.
+  // eslint-disable-next-line no-use-before-define
+  const items = await SecondarySkillArea.find({
+    name: this.name,
+    parentPrimarySkillArea: this.parentPrimarySkillArea
+  });
+
+  if (items.length > 0)
+    return next(
+      `Duplicate entry. There is already a SecondarySkillArea with name: ${this.name} and parentPrimarySkillArea: ${this.parentPrimarySkillArea}`
+    );
+  return next();
+});
+
 const SecondarySkillArea = mongoose.model('SecondarySkillArea', secondarySkillAreaSchema);
 
 export default SecondarySkillArea;
