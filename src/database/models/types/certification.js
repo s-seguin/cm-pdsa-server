@@ -23,7 +23,11 @@ const Certification = PdsaItem.discriminator(
       required: false
     },
     deliveryMethod: { type: String, validate: deliveryMethodValidator }, // 'Online', 'InClass', 'Both'
-    location: String,
+    location: {
+      country: String,
+      province: String,
+      city: String
+    },
     ongoing: Boolean
   })
 );
