@@ -12,13 +12,13 @@ import Other from '../database/models/types/other';
  */
 const getPdsaItemModel = itemName =>
   ({
-    book: Book,
-    subscription: Subscription,
-    certification: Certification,
-    conference: Conference,
-    'course-seminar': CourseSeminar,
+    books: Book,
+    subscriptions: Subscription,
+    certifications: Certification,
+    conferences: Conference,
+    'course-seminars': CourseSeminar,
     other: Other,
-    '*': PdsaItem
+    'pdsa-items': PdsaItem
   }[itemName] || null);
 
 /**
