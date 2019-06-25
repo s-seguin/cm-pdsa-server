@@ -15,15 +15,17 @@ const primarySkillAreaSchema = mongoose.Schema({
  *
  * Simulates a On Delete Cascade functionality from SQL. Function is named an not an arrow function so that we can access 'this'
  */
-primarySkillAreaSchema.pre('remove', function cascadeDeleteChildren(next) {
+primarySkillAreaSchema.pre('remove', async function cascadeDeleteChildren(next) {
   // Cascade delete all SecondarySkillAreas that belong to the primary Skill Areas
-  SecondarySkillArea.deleteMany({ parentPrimarySkillArea: this._id }, (err, res) => {
-    if (err) next(`Error: ${err}`);
-    else {
-      console.log(res);
-      next();
-    }
-  });
+  try {
+    const deleteChildrenRes = await SecondarySkillArea.deleteMany({
+      parentPrimarySkillArea: this._id
+    });
+    console.log(deleteChildrenRes);
+    next();
+  } catch (e) {
+    next(`Error: ${e}`);
+  }
 });
 
 const PrimarySkillArea = mongoose.model('PrimarySkillArea', primarySkillAreaSchema);
