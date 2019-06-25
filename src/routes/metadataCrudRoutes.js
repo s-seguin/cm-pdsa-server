@@ -49,6 +49,7 @@ router.get('/:type/parent-id/:parentId', findMetadataByParentId);
 /**
  * Update metadata object with specified type and id, updated object provided in body
  */
+router.patch('/:type/:id', updateMetadataById);
 router.put('/:type/:id', updateMetadataById);
 
 // ////// //

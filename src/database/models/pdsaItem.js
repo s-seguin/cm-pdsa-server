@@ -32,11 +32,11 @@ import { pdsaTierValidator, costValidator } from './validation';
 const pdsaItemSchema = mongoose.Schema({
   name: { type: String, required: true },
   // We include both primarySkillArea and secondarySkillArea (even though secondary has a reference to its primary) to improve query times
-  primarySkillArea: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'PrimarySkillArea',
-    required: true
-  },
+  // primarySkillArea: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'PrimarySkillArea',
+  //   required: true
+  // },
   secondarySkillArea: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SecondarySkillArea',
