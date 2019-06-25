@@ -25,6 +25,8 @@ import { pdsaTierValidator, costValidator } from './validation';
  *  reviews: Reviews of the item by prev employees. Includes rating out of 5, review and the user who reviewed it
  *
  *  comments: any additional comments
+ *
+ *  visible: is this item currently viewable to users?
  * */
 
 const pdsaItemSchema = mongoose.Schema({
@@ -60,7 +62,8 @@ const pdsaItemSchema = mongoose.Schema({
       reviewedBy: String
     }
   ],
-  comments: String
+  comments: String,
+  visible: Boolean
 });
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);
