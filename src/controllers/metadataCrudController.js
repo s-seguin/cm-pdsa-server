@@ -192,7 +192,7 @@ export const deleteMetadataById = async (req, res) => {
       res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -211,6 +211,6 @@ export const updateMetadataById = async (req, res) => {
       res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };

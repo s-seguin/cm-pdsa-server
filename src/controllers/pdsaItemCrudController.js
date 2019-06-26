@@ -45,12 +45,13 @@ export const create = async (req, res) => {
       res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(
-      400,
-      ItemModel !== PdsaItem
-        ? `Error: Provided paramter :type was incorrect`
-        : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
-    );
+    res
+      .status(400)
+      .send(
+        ItemModel !== PdsaItem
+          ? `Error: Provided paramter :type was incorrect`
+          : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
+      );
   }
 };
 
