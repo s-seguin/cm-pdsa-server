@@ -1,22 +1,47 @@
 import express from 'express';
-import { create, find } from '../controllers/pdsaItemCrudController';
+import { create, find, findById, update, deleteItem } from '../controllers/pdsaItemCrudController';
 
 const router = express.Router();
 
+// ////// //
+// CREATE //
+// ////// //
 /**
  * The route to create a new PDSA item. Creation handled by controller.
  */
-router.post('/create/:type', create);
+router.post('/:type', create);
 
+// //// //
+// READ //
+// //// //
 /**
  * The route to find the different PDSA items. Logic handled by controller.
  */
-router.get('/find/all/:type', find);
+router.get('/:type', find);
 
-// router.get('/find/children/:id', findAllSecondarySkills);
+/**
+ * Return the PDSA item specified by type and id
+ */
+router.get('/:type/:id', findById);
 
-// router.get('/find/unique/:type/:id');
+// ////// //
+// UPDATE //
+// ////// //
+/**
+ * Update the PDSA item specified by type and id
+ */
+router.put('/:type/:id', update);
+/**
+ * Update the PDSA item specified by type and id
+ */
+router.patch('/:type/:id', update);
 
-// router.get('/find/matching/:type/:name')
+// ////// //
+// DELETE //
+// ////// //
+/**
+ * Delete the PDSA item specified by type and id
+ */
+router.delete('/:type/:id', deleteItem);
 
 export default router;

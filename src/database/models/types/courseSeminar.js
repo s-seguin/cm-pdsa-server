@@ -32,7 +32,11 @@ const CourseSeminar = PdsaItem.discriminator(
       required: false
     },
     deliveryMethod: { type: String, validate: deliveryMethodValidator },
-    location: String,
+    location: {
+      country: String,
+      province: String,
+      city: String
+    },
     notableDates: { start: Date, end: Date, otherDates: [Date] },
     ongoing: Boolean
   })

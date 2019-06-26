@@ -15,14 +15,13 @@ const institutionSchema = mongoose.Schema({
  *
  * Simulates a On Delete Cascade functionality from SQL. Function is named an not an arrow function so that we can access 'this'
  */
-institutionSchema.pre('remove', function cascadeDeleteChildren(next) {
-  Program.deleteMany({ institution: this._id }, (err, res) => {
-    if (err) next(`Error: ${err}`);
-    else {
-      console.log(res);
-      next();
-    }
-  });
+institutionSchema.pre('remove', async function cascadeDeleteChildren(next) {
+  try {
+    await Program.deleteMany({ institution: this._id });
+    next();
+  } catch (e) {
+    next(`Error: ${e}`);
+  }
 });
 
 const Institution = mongoose.model('Institution', institutionSchema);

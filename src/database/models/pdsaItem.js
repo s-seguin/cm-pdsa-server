@@ -25,16 +25,18 @@ import { pdsaTierValidator, costValidator } from './validation';
  *  reviews: Reviews of the item by prev employees. Includes rating out of 5, review and the user who reviewed it
  *
  *  comments: any additional comments
+ *
+ *  visible: is this item currently viewable to users?
  * */
 
 const pdsaItemSchema = mongoose.Schema({
   name: { type: String, required: true },
   // We include both primarySkillArea and secondarySkillArea (even though secondary has a reference to its primary) to improve query times
-  primarySkillArea: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'PrimarySkillArea',
-    required: true
-  },
+  // primarySkillArea: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'PrimarySkillArea',
+  //   required: true
+  // },
   secondarySkillArea: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SecondarySkillArea',
@@ -60,7 +62,8 @@ const pdsaItemSchema = mongoose.Schema({
       reviewedBy: String
     }
   ],
-  comments: String
+  comments: String,
+  visible: Boolean
 });
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);

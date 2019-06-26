@@ -9,36 +9,35 @@ import Program from '../database/models/metadata/program';
  */
 const getMetadataModel = itemName =>
   ({
-    'primary-skill': PrimarySkillArea,
-    'secondary-skill': SecondarySkillArea,
-    institution: Institution,
-    program: Program
+    'primary-skills': PrimarySkillArea,
+    'secondary-skills': SecondarySkillArea,
+    institutions: Institution,
+    programs: Program
   }[itemName] || null);
 
 /**
- * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
+ * Creates a new MetadataItem to store in the DB from the JSON data passed in the req.body.
  *
  * This is a generic controller that looks at the PDSA type being requested through the url parameters
  *
- * TODO: Add validation that the data being received is correct. Will be done in models.
  * @param {Request} req the request object
  * @param {Response} res the response object
  */
-export const createMetadata = (req, res) => {
+export const createMetadata = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
 
   if (MetadataModel !== null) {
     // we need to instantiate a new Object of type determined by getMetadataModel
     const instantiatedItem = new MetadataModel(req.body);
 
-    instantiatedItem.save(err => {
-      if (err) {
-        console.log(`Error: ${err}`);
-        res.send(`Error: ${err}`);
-      } else res.sendStatus(200);
-    });
+    try {
+      const result = await instantiatedItem.save();
+      res.status(201).send(result);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
   } else {
-    res.send(`Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -48,24 +47,124 @@ export const createMetadata = (req, res) => {
  * @param {Request} req the request object
  * @param {Response} res the response object
  */
-export const findMetadata = (req, res) => {
+export const findMetadata = async (req, res) => {
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
+  if (MetadataModel !== null) {
+    try {
+      const results = await MetadataModel.find()
+        .populate('parentPrimarySkillArea')
+        .populate({
+          path: 'secondarySkillArea',
+          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+        })
+        .populate('institution')
+        .populate('program')
+        .exec();
+
+      res.status(200).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * This is a generic find returns a singular item that matches the type and id provided.
+ *
+ * @param {Request} req the request object
+ * @param {Response} res the response object
+ */
+export const findMetadataById = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
 
   if (MetadataModel !== null) {
-    MetadataModel.find()
-      .populate('parentPrimarySkillArea')
-      .populate({
-        path: 'secondarySkillArea',
-        populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-      })
-      .populate('institution')
-      .populate('program')
-      .exec((err, items) => {
-        if (err) return res.send(`Error: ${err}`);
-        return res.send(items);
-      });
+    try {
+      const results = await MetadataModel.findById(req.params.id)
+        .populate('parentPrimarySkillArea')
+        .populate({
+          path: 'secondarySkillArea',
+          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+        })
+        .populate('institution')
+        .populate('program')
+        .exec();
+
+      res.status(200).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
   } else {
-    res.send(`Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * This is a generic find returns items that match the type and name.
+ *
+ * @param {Request} req the request object
+ * @param {Response} res the response object
+ */
+export const findMetadataByName = async (req, res) => {
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
+
+  if (MetadataModel !== null) {
+    try {
+      const results = await MetadataModel.find({ name: req.params.name })
+        .populate('parentPrimarySkillArea')
+        .populate({
+          path: 'secondarySkillArea',
+          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+        })
+        .populate('institution')
+        .populate('program')
+        .exec();
+
+      res.status(200).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * This method returns all metadata objects of the specified type that are children of the specified parent-id
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const findMetadataByParentId = async (req, res) => {
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
+
+  if (
+    MetadataModel !== null &&
+    (MetadataModel === Program || MetadataModel === SecondarySkillArea)
+  ) {
+    try {
+      const searchParam =
+        MetadataModel === Program
+          ? { institution: req.params.parentId }
+          : { parentPrimarySkillArea: req.params.parentId };
+
+      const results = await MetadataModel.find(searchParam)
+        .populate('parentPrimarySkillArea')
+        .populate({
+          path: 'secondarySkillArea',
+          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+        })
+        .populate('institution')
+        .populate('program')
+        .exec();
+
+      res.status(200).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -79,20 +178,38 @@ export const findMetadata = (req, res) => {
  * @param {Request} req the req object, req.params.id is the id of the object we want to delete
  * @param {Response} res the result object that we return to the client
  */
-export const deleteMetadataById = (req, res) => {
-  const ItemModel = getMetadataModel(req.params.type.toLowerCase());
-  if (ItemModel !== null) {
+export const deleteMetadataById = async (req, res) => {
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
+  if (MetadataModel !== null) {
     // Find the item we want to delete
-    ItemModel.findById(req.params.id, async (err, items) => {
-      if (err) return res.send(`Error: ${err}`);
-      try {
-        // If we find an item with a matching ID, remove it so that the pre 'remove' hook will be called in the model
-        return res.send(await items.remove());
-      } catch (e) {
-        return res.send(`Error: ${e}`);
-      }
-    });
+    try {
+      const itemToDelete = await MetadataModel.findById(req.params.id);
+      const delResults = await itemToDelete.remove();
+
+      res.status(200).send(delResults);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
   } else {
-    res.send(`Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * Update the specified metadata item (specified by id) with the object sent in the request body
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const updateMetadataById = async (req, res) => {
+  const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
+  if (MetadataModel !== null) {
+    try {
+      const updateRes = await MetadataModel.update({ _id: req.params.id }, req.body);
+      res.status(201).send(updateRes);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };

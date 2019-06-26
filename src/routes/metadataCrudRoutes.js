@@ -2,27 +2,62 @@ import express from 'express';
 import {
   createMetadata,
   findMetadata,
-  deleteMetadataById
+  deleteMetadataById,
+  findMetadataById,
+  updateMetadataById,
+  findMetadataByName,
+  findMetadataByParentId
 } from '../controllers/metadataCrudController';
 
 const router = express.Router();
-
+// ////// //
+// CREATE //
+// ////// //
 /**
  * The route to create a new PDSA item. Creation handled by controller.
  */
-router.post('/create/:type', createMetadata);
+router.post('/:type', createMetadata);
 
-router.delete('/delete/:type/id/:id', deleteMetadataById);
-
+// //// //
+// READ //
+// //// //
 /**
  * The route to find the different PDSA items. Logic handled by controller.
  */
-router.get('/find/all/:type', findMetadata);
+router.get('/:type', findMetadata);
 
-// router.get('/find/children/:id', findAllSecondarySkills);
+/**
+ * Return a singular metadata object of type 'type' specified by id
+ */
+router.get('/:type/:id', findMetadataById);
 
-// router.get('/find/unique/:type/:id');
+/**
+ * Return all metadata objects of type 'type' that match the specified name
+ *
+ * Should return singular objects due to unique nature of schemas
+ */
+router.get('/:type/name/:name', findMetadataByName);
 
-// router.get('/find/matching/:type/:name')
+/**
+ * Return all metadata objects of type 'type' that belong to parent with parent id = 'parentId'
+ */
+router.get('/:type/parent-id/:parentId', findMetadataByParentId);
+
+// ////// //
+// UPDATE //
+// ////// //
+/**
+ * Update metadata object with specified type and id, updated object provided in body
+ */
+router.patch('/:type/:id', updateMetadataById);
+router.put('/:type/:id', updateMetadataById);
+
+// ////// //
+// DELETE //
+// ////// //
+/**
+ * Delete the metadata object with the specified type and id
+ */
+router.delete('/:type/:id', deleteMetadataById);
 
 export default router;

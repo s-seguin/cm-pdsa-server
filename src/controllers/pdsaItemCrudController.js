@@ -12,13 +12,13 @@ import Other from '../database/models/types/other';
  */
 const getPdsaItemModel = itemName =>
   ({
-    book: Book,
-    subscription: Subscription,
-    certification: Certification,
-    conference: Conference,
-    'course-seminar': CourseSeminar,
+    books: Book,
+    subscriptions: Subscription,
+    certifications: Certification,
+    conferences: Conference,
+    'course-seminars': CourseSeminar,
     other: Other,
-    '*': PdsaItem
+    'pdsa-items': PdsaItem
   }[itemName] || null);
 
 /**
@@ -30,7 +30,7 @@ const getPdsaItemModel = itemName =>
  * @param {*} req the request object
  * @param {*} res the response object
  */
-export const create = (req, res) => {
+export const create = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
   // We are a not allowed to create Generic PdsaItems, use type Other instead.
@@ -38,18 +38,20 @@ export const create = (req, res) => {
     // we need to instantiate a new Object of type determined by the pdsaItemSwitch
     const instantiatedItem = new ItemModel(req.body);
 
-    instantiatedItem.save(err => {
-      if (err) {
-        console.log(`Error: ${err}`);
-        res.send(`Error: ${err}`);
-      } else res.sendStatus(200);
-    });
+    try {
+      const result = await instantiatedItem.save();
+      res.status(201).send(result);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
   } else {
-    res.send(
-      ItemModel !== PdsaItem
-        ? `Error: Provided paramter :type was incorrect`
-        : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
-    );
+    res
+      .status(400)
+      .send(
+        ItemModel !== PdsaItem
+          ? `Error: Provided paramter :type was incorrect`
+          : `Error: Provided paramter :type was incorrect. Do not try and create generic PdsaItems, use type Other instead.`
+      );
   }
 };
 
@@ -59,23 +61,108 @@ export const create = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-export const find = (req, res) => {
+export const find = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
   if (ItemModel !== null) {
-    ItemModel.find()
-      // .populate('primarySkillArea')
-      .populate({
-        path: 'secondarySkillArea',
-        populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-      })
-      .populate('institution')
-      .populate('program')
-      .exec((err, items) => {
-        if (err) return res.send(`Error: ${err}`);
-        return res.send(items);
-      });
+    try {
+      const results = await ItemModel.find()
+        .populate({
+          path: 'secondarySkillArea',
+          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+        })
+        .populate('institution')
+        .populate('program')
+        .exec();
+      res.status(200).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
   } else {
-    res.send(`Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+export const findById = async (req, res) => {
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+
+  if (ItemModel !== null) {
+    try {
+      const results = await ItemModel.findById(req.params.id)
+        .populate({
+          path: 'secondarySkillArea',
+          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
+        })
+        .populate('institution')
+        .populate('program')
+        .exec();
+      res.status(200).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * Update the specified pdsa item (specified by id) with the object sent in the request body
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const update = async (req, res) => {
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    try {
+      const results = await ItemModel.update({ _id: req.params.id }, req.body);
+      res.status(201).send(results);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * Update the specified pdsa item (specified by id) with the object sent in the request body
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const deleteItem = async (req, res) => {
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    try {
+      const delRes = await ItemModel.deleteOne({ _id: req.params.id });
+      res.status(200).send(delRes);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
+ * Update the specified pdsa item (specified by id) with the object sent in the request body
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const deleteMany = async (req, res) => {
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    try {
+      let delRes = null;
+      if (req.query.ids === undefined) delRes = await ItemModel.deleteMany();
+      else {
+        const ids = req.query.ids.split(',');
+        delRes = await ItemModel.deleteMany({ _id: { $in: ids } });
+      }
+      res.status(200).send(delRes);
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
