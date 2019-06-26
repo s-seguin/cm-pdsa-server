@@ -24,11 +24,6 @@ router.get('/:type', find);
  */
 router.get('/:type/:id', findById);
 
-// testing -> provide search param in query and it can return the objects
-router.get('/:type/search', (req, res) => {
-  res.send(req.query);
-});
-
 // ////// //
 // UPDATE //
 // ////// //

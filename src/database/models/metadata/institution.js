@@ -17,8 +17,7 @@ const institutionSchema = mongoose.Schema({
  */
 institutionSchema.pre('remove', async function cascadeDeleteChildren(next) {
   try {
-    const deleteChildrenRes = await Program.deleteMany({ institution: this._id });
-    console.log(deleteChildrenRes);
+    await Program.deleteMany({ institution: this._id });
     next();
   } catch (e) {
     next(`Error: ${e}`);

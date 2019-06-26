@@ -18,10 +18,9 @@ const primarySkillAreaSchema = mongoose.Schema({
 primarySkillAreaSchema.pre('remove', async function cascadeDeleteChildren(next) {
   // Cascade delete all SecondarySkillAreas that belong to the primary Skill Areas
   try {
-    const deleteChildrenRes = await SecondarySkillArea.deleteMany({
+    await SecondarySkillArea.deleteMany({
       parentPrimarySkillArea: this._id
     });
-    console.log(deleteChildrenRes);
     next();
   } catch (e) {
     next(`Error: ${e}`);

@@ -32,12 +32,12 @@ export const createMetadata = async (req, res) => {
 
     try {
       const result = await instantiatedItem.save();
-      res.send(201, result);
+      res.status(201).send(result);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -62,12 +62,12 @@ export const findMetadata = async (req, res) => {
         .populate('program')
         .exec();
 
-      res.send(200, results);
+      res.status(200).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -92,12 +92,12 @@ export const findMetadataById = async (req, res) => {
         .populate('program')
         .exec();
 
-      res.send(200, results);
+      res.status(200).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -122,12 +122,12 @@ export const findMetadataByName = async (req, res) => {
         .populate('program')
         .exec();
 
-      res.send(200, results);
+      res.status(200).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -160,12 +160,12 @@ export const findMetadataByParentId = async (req, res) => {
         .populate('program')
         .exec();
 
-      res.send(200, results);
+      res.status(200).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -184,12 +184,12 @@ export const deleteMetadataById = async (req, res) => {
   if (MetadataModel !== null) {
     // Find the item we want to delete
     try {
-      const itemsToDelete = await MetadataModel.findById(req.params.id);
-      const delResults = await itemsToDelete.remove();
+      const itemToDelete = await MetadataModel.findById(req.params.id);
+      const delResults = await itemToDelete.remove();
 
       res.send(200, delResults);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
     res.send(400, `Error: Provided paramter :type was incorrect`);
@@ -208,7 +208,7 @@ export const updateMetadataById = async (req, res) => {
       const updateRes = await MetadataModel.update({ _id: req.params.id }, req.body);
       res.send(201, updateRes);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
     res.send(400, `Error: Provided paramter :type was incorrect`);

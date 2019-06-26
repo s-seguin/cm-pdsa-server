@@ -40,9 +40,9 @@ export const create = async (req, res) => {
 
     try {
       const result = await instantiatedItem.save();
-      res.send(201, result);
+      res.status(201).send(result);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
     res.send(
@@ -73,12 +73,12 @@ export const find = async (req, res) => {
         .populate('institution')
         .populate('program')
         .exec();
-      res.send(200, results);
+      res.status(200).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -95,12 +95,12 @@ export const findById = async (req, res) => {
         .populate('institution')
         .populate('program')
         .exec();
-      res.send(200, results);
+      res.status(200).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -114,12 +114,12 @@ export const update = async (req, res) => {
   if (ItemModel !== null) {
     try {
       const results = await ItemModel.update({ _id: req.params.id }, req.body);
-      res.send(201, results);
+      res.status(201).send(results);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -133,12 +133,12 @@ export const deleteItem = async (req, res) => {
   if (ItemModel !== null) {
     try {
       const delRes = await ItemModel.deleteOne({ _id: req.params.id });
-      res.send(200, delRes);
+      res.status(200).send(delRes);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
 
@@ -157,11 +157,11 @@ export const deleteMany = async (req, res) => {
         const ids = req.query.ids.split(',');
         delRes = await ItemModel.deleteMany({ _id: { $in: ids } });
       }
-      res.send(200, delRes);
+      res.status(200).send(delRes);
     } catch (e) {
-      res.send(500, `Error: ${e}`);
+      res.status(500).send(`Error: ${e}`);
     }
   } else {
-    res.send(400, `Error: Provided paramter :type was incorrect`);
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
 };
