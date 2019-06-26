@@ -16,7 +16,7 @@ const getMetadataModel = itemName =>
   }[itemName] || null);
 
 /**
- * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
+ * Creates a new MetadataItem to store in the DB from the JSON data passed in the req.body.
  *
  * This is a generic controller that looks at the PDSA type being requested through the url parameters
  *
@@ -187,7 +187,7 @@ export const deleteMetadataById = async (req, res) => {
       const itemToDelete = await MetadataModel.findById(req.params.id);
       const delResults = await itemToDelete.remove();
 
-      res.send(200, delResults);
+      res.status(200).send(delResults);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
@@ -206,7 +206,7 @@ export const updateMetadataById = async (req, res) => {
   if (MetadataModel !== null) {
     try {
       const updateRes = await MetadataModel.update({ _id: req.params.id }, req.body);
-      res.send(201, updateRes);
+      res.status(201).send(updateRes);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
