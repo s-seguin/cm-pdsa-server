@@ -49,7 +49,6 @@ export const createMetadata = async (req, res) => {
  */
 export const findMetadata = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
-  console.log(req.query);
   if (MetadataModel !== null) {
     try {
       const results = await MetadataModel.find()
