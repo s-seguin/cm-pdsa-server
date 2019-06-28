@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { pdsaTierValidator, costValidator } from './validation';
+import { pdsaTierValidator, costValidator, notEmptyArrayValidator } from './validation';
 
 /**
  * This is the main schema to hold generic PDSA Item Details. Catherine specified the types that are available and we are creating new schemas for the non-generic types.
@@ -32,15 +32,27 @@ import { pdsaTierValidator, costValidator } from './validation';
 const pdsaItemSchema = mongoose.Schema({
   name: { type: String, required: true },
   // We include both primarySkillArea and secondarySkillArea (even though secondary has a reference to its primary) to improve query times
-  // primarySkillArea: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'PrimarySkillArea',
-  //   required: true
-  // },
-  secondarySkillArea: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SecondarySkillArea',
-    required: true
+  primarySkillAreas: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PrimarySkillArea',
+        required: true
+      }
+    ],
+    required: true,
+    validate: notEmptyArrayValidator
+  },
+  secondarySkillAreas: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SecondarySkillArea',
+        required: true
+      }
+    ],
+    required: true,
+    validate: notEmptyArrayValidator
   },
   url: { type: String, required: true },
   startingPdsaTier: { type: Number, required: true, validate: pdsaTierValidator },

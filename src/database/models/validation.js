@@ -1,16 +1,29 @@
+/**
+ * Custom validator to ensure that the provided array is not empty
+ * [0] -> the function to validate the provided array isn't empty
+ * [1] -> the error message is the validation is unsuccessful
+ */
+export const notEmptyArrayValidator = [
+  arr => {
+    if (arr.length <= 0) return false;
+    return true;
+  },
+  'Please supply a reference to the skill area.'
+];
+
 // //////////////////////// //
 // DELIVER METHOD VALIDATOR //
 // //////////////////////// //
-/** Custom validator to ensure PDSA Tier is a number between 1-4
- * [0] -> the function to validate the pdsaTier
+/** Custom validator to ensure the deliver method is either online, in-class, both
+ * [0] -> the function to validate the delivery method
  * [1] -> the error message is the validation is unsuccessful
  */
 export const deliveryMethodValidator = [
-  deliverMethod => {
-    if (['online', 'in-class', 'both'].includes(deliverMethod)) return false;
+  deliveryMethod => {
+    if (!['online', 'in-class', 'both'].includes(deliveryMethod)) return false;
     return true;
   },
-  'Invalid delivery method. Delivery Method can be Online, InClass or Both'
+  'Invalid delivery method. Delivery Method can be online, in-class or both'
 ];
 
 // /////////////////// //

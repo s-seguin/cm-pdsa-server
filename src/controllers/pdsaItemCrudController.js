@@ -103,10 +103,8 @@ export const find = async (req, res) => {
   if (ItemModel !== null) {
     try {
       const results = await ItemModel.find(mongooseQueryBuilder(req.query))
-        .populate({
-          path: 'secondarySkillArea',
-          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-        })
+        .populate('primarySkillAreas')
+        .populate('secondarySkillAreas')
         .populate('institution')
         .populate('program')
         .exec();
