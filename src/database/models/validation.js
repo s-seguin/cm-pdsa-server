@@ -1,14 +1,31 @@
 /**
- * Custom validator to ensure that the provided array is not empty
- * [0] -> the function to validate the provided array isn't empty
- * [1] -> the error message is the validation is unsuccessful
+ * Check to make sure that an array isn't empty
+ * @param {Array} arr
  */
-export const notEmptyArrayValidator = [
-  arr => {
-    if (arr.length <= 0) return false;
-    return true;
-  },
-  'Please supply a reference to the skill area.'
+const notEmptyArrayValidator = arr => {
+  if (arr.length <= 0) return false;
+  return true;
+};
+
+/**
+ * Check to make sure the array of Primary or Secondary skill areas does not contain duplicate entries
+ * @param {Array} arr
+ */
+const noDuplicateValues = arr => {
+  for (let i = 0; i < arr.length; i += 1) {
+    for (let j = i + 1; j < arr.length; j += 1) {
+      if (JSON.stringify(arr[i]) === JSON.stringify(arr[j])) return false;
+    }
+  }
+  return true;
+};
+
+export const arrayValidator = [
+  { validator: notEmptyArrayValidator, msg: 'The supplied arrays of Skill Areas cannot be empty.' },
+  {
+    validator: noDuplicateValues,
+    msg: 'The supplied array of Skill Areas cannot contain duplicate entries.'
+  }
 ];
 
 // //////////////////////// //

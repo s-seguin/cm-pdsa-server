@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { pdsaTierValidator, costValidator, notEmptyArrayValidator } from './validation';
+import { pdsaTierValidator, costValidator, arrayValidator } from './validation';
 
 /**
  * This is the main schema to hold generic PDSA Item Details. Catherine specified the types that are available and we are creating new schemas for the non-generic types.
@@ -41,7 +41,7 @@ const pdsaItemSchema = mongoose.Schema({
       }
     ],
     required: true,
-    validate: notEmptyArrayValidator
+    validate: arrayValidator
   },
   secondarySkillAreas: {
     type: [
@@ -52,7 +52,7 @@ const pdsaItemSchema = mongoose.Schema({
       }
     ],
     required: true,
-    validate: notEmptyArrayValidator
+    validate: arrayValidator
   },
   url: { type: String, required: true },
   startingPdsaTier: { type: Number, required: true, validate: pdsaTierValidator },

@@ -66,10 +66,10 @@ const mongooseQueryBuilder = urlQuery => {
   if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
 
   // add filters for skills
-  if (!undefinedNullOrEmpty(urlQuery.primarySkillArea))
-    query.primarySkillArea = urlQuery.primarySkillArea;
-  if (!undefinedNullOrEmpty(urlQuery.secondarySkillArea))
-    query.secondarySkillArea = urlQuery.secondarySkillArea;
+  if (!undefinedNullOrEmpty(urlQuery.primarySkillAreas))
+    query.primarySkillAreas = urlQuery.primarySkillAreas;
+  if (!undefinedNullOrEmpty(urlQuery.secondarySkillAreas))
+    query.secondarySkillAreas = urlQuery.secondarySkillAreas;
 
   // add filters for cost
   if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
@@ -83,9 +83,14 @@ const mongooseQueryBuilder = urlQuery => {
   )
     query['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
 
+  // add filters for location
   if (!undefinedNullOrEmpty(urlQuery.country)) query['location.country'] = urlQuery.country;
   if (!undefinedNullOrEmpty(urlQuery.province)) query['location.province'] = urlQuery.province;
   if (!undefinedNullOrEmpty(urlQuery.city)) query['location.city'] = urlQuery.city;
+
+  // add filters for deliveryMethod
+  if (!undefinedNullOrEmpty(urlQuery.deliveryMethod))
+    query.deliveryMethod = urlQuery.deliveryMethod;
 
   console.log(JSON.stringify(query));
   return Object.entries(query).length > 0 ? query : null;
