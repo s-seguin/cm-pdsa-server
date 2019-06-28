@@ -55,18 +55,54 @@ export const create = async (req, res) => {
   }
 };
 
+const undefinedNullOrEmpty = obj => {
+  if (obj === null || obj === undefined || obj.trim() === '') return true;
+  return false;
+};
+
+const mongooseQueryBuilder = urlQuery => {
+  const query = {};
+  // add a filter for name
+  if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
+
+  // add filters for skills
+  if (!undefinedNullOrEmpty(urlQuery.primarySkillArea))
+    query.primarySkillArea = urlQuery.primarySkillArea;
+  if (!undefinedNullOrEmpty(urlQuery.secondarySkillArea))
+    query.secondarySkillArea = urlQuery.secondarySkillArea;
+
+  // add filters for cost
+  if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
+  if (!undefinedNullOrEmpty(urlQuery.maxCost)) query['cost.maxCost'] = urlQuery.maxCost;
+  if (!undefinedNullOrEmpty(urlQuery.currency))
+    query['cost.currency'] = urlQuery.currency.toUpperCase();
+  if (
+    !undefinedNullOrEmpty(urlQuery.groupPricingAvailable) &&
+    (urlQuery.groupPricingAvailable.trim().toLowerCase() === 'true' ||
+      urlQuery.groupPricingAvailable.trim().toLowerCase() === 'false')
+  )
+    query['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
+
+  if (!undefinedNullOrEmpty(urlQuery.country)) query['location.country'] = urlQuery.country;
+  if (!undefinedNullOrEmpty(urlQuery.province)) query['location.province'] = urlQuery.province;
+  if (!undefinedNullOrEmpty(urlQuery.city)) query['location.city'] = urlQuery.city;
+
+  console.log(JSON.stringify(query));
+  return Object.entries(query).length > 0 ? query : null;
+};
+
 /**
  * This is a generic find all, allows us to find all the documents of the specified type.
  *
- * @param {*} req
- * @param {*} res
+ * @param {Request} req
+ * @param {Response} res
  */
 export const find = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
   if (ItemModel !== null) {
     try {
-      const results = await ItemModel.find()
+      const results = await ItemModel.find(mongooseQueryBuilder(req.query))
         .populate({
           path: 'secondarySkillArea',
           populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
