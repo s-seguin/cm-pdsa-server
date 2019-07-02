@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import PdsaItem from '../database/models/pdsaItem';
 import Book from '../database/models/types/book';
 import Subscription from '../database/models/types/subscription';
@@ -60,7 +61,7 @@ const undefinedNullOrEmpty = obj => {
   return false;
 };
 
-const mongooseQueryBuilder = urlQuery => {
+const mongooseExactMatchQueryBuilder = urlQuery => {
   const query = {};
   // add a filter for name
   if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
@@ -101,8 +102,10 @@ const mongooseQueryBuilder = urlQuery => {
   if (!undefinedNullOrEmpty(urlQuery.visible)) query.visible = urlQuery.visible === 'true';
 
   // add filters for institution and program
-  if (!undefinedNullOrEmpty(urlQuery.institution)) query.institution = urlQuery.institution;
-  if (!undefinedNullOrEmpty(urlQuery.program)) query.program = urlQuery.program;
+  if (!undefinedNullOrEmpty(urlQuery.institution))
+    query.institution = mongoose.Types.ObjectId(urlQuery.institution);
+  if (!undefinedNullOrEmpty(urlQuery.program))
+    query.program = mongoose.Types.ObjectId(urlQuery.program);
 
   console.log(JSON.stringify(query));
   return Object.entries(query).length > 0 ? query : null;
@@ -119,7 +122,7 @@ export const find = async (req, res) => {
 
   if (ItemModel !== null) {
     try {
-      const results = await ItemModel.find(mongooseQueryBuilder(req.query))
+      const results = await ItemModel.find(mongooseExactMatchQueryBuilder(req.query))
         .populate('primarySkillAreas')
         .populate('secondarySkillAreas')
         .populate('institution')
