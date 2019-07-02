@@ -75,7 +75,7 @@ const pdsaItemSchema = mongoose.Schema({
     }
   ],
   comments: String,
-  visible: Boolean
+  visible: { type: Boolean, required: true }
 });
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);

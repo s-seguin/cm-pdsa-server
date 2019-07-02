@@ -20,6 +20,7 @@ const noDuplicateValues = arr => {
   return true;
 };
 
+// The validator for skill areas arrays
 export const arrayValidator = [
   { validator: notEmptyArrayValidator, msg: 'The supplied arrays of Skill Areas cannot be empty.' },
   {

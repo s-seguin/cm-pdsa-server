@@ -65,11 +65,12 @@ const mongooseQueryBuilder = urlQuery => {
   // add a filter for name
   if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
 
-  // add filters for skills
+  // add filters for skills -> matches primary skill area ids
+  // user can pass in a list of ids separated via commas, split them and trim all whitespace
   if (!undefinedNullOrEmpty(urlQuery.primarySkillAreas))
-    query.primarySkillAreas = urlQuery.primarySkillAreas;
+    query.primarySkillAreas = { $in: urlQuery.primarySkillAreas.split(',').map(e => e.trim()) };
   if (!undefinedNullOrEmpty(urlQuery.secondarySkillAreas))
-    query.secondarySkillAreas = urlQuery.secondarySkillAreas;
+    query.secondarySkillAreas = { $in: urlQuery.secondarySkillAreas.split(',').map(e => e.trim()) };
 
   // add filters for cost
   if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
@@ -91,6 +92,17 @@ const mongooseQueryBuilder = urlQuery => {
   // add filters for deliveryMethod
   if (!undefinedNullOrEmpty(urlQuery.deliveryMethod))
     query.deliveryMethod = urlQuery.deliveryMethod;
+
+  // add filters for pdsa tier
+  if (!undefinedNullOrEmpty(urlQuery.startingPdsaTier))
+    query.startingPdsaTier = urlQuery.startingPdsaTier;
+
+  // add filters for visibility
+  if (!undefinedNullOrEmpty(urlQuery.visible)) query.visible = urlQuery.visible === 'true';
+
+  // add filters for institution and program
+  if (!undefinedNullOrEmpty(urlQuery.institution)) query.institution = urlQuery.institution;
+  if (!undefinedNullOrEmpty(urlQuery.program)) query.program = urlQuery.program;
 
   console.log(JSON.stringify(query));
   return Object.entries(query).length > 0 ? query : null;
