@@ -5,7 +5,7 @@ import Certification from '../database/models/types/certification';
 import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
-import { undefinedNullOrEmpty, mongooseQueryBuilderForFilter } from './helpers/queryHelper';
+import { undefinedNullOrEmpty, createFilterForMongooseQuery } from './helpers/queryHelper';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
@@ -73,7 +73,7 @@ export const sendPaginatedResults = async (req, res, ItemModel) => {
       options.limit = req.query.limit;
     }
 
-    const results = await ItemModel.paginate(mongooseQueryBuilderForFilter(req.query), options);
+    const results = await ItemModel.paginate(createFilterForMongooseQuery(req.query), options);
 
     res.status(200).send(results);
   } catch (e) {
@@ -90,7 +90,7 @@ export const sendPaginatedResults = async (req, res, ItemModel) => {
  */
 export const sendAllResults = async (req, res, ItemModel) => {
   try {
-    const results = await ItemModel.find(mongooseQueryBuilderForFilter(req.query))
+    const results = await ItemModel.find(createFilterForMongooseQuery(req.query))
       .populate('primarySkillAreas')
       .populate('secondarySkillAreas')
       .populate('institution')

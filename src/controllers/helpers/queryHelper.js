@@ -11,7 +11,7 @@ export const undefinedNullOrEmpty = obj => {
  * Creates an object to filter Mongoose queries based on the parameters passed in the Request.query
  * @param {Request.query} urlQuery
  */
-export const mongooseQueryBuilderForFilter = urlQuery => {
+export const createFilterForMongooseQuery = urlQuery => {
   const query = {};
   // add a filter for name
   if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
