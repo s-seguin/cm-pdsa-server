@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import { pdsaTierValidator, costValidator, arrayValidator } from './validation';
 
 /**
@@ -77,6 +78,8 @@ const pdsaItemSchema = mongoose.Schema({
   comments: String,
   visible: { type: Boolean, required: true }
 });
+
+pdsaItemSchema.plugin(mongoosePaginate);
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);
 

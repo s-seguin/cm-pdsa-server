@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import PdsaItem from '../database/models/pdsaItem';
 import Book from '../database/models/types/book';
 import Subscription from '../database/models/types/subscription';
@@ -6,10 +5,11 @@ import Certification from '../database/models/types/certification';
 import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
+import { undefinedNullOrEmpty, mongooseQueryBuilderForFilter } from './helpers/queryHelper';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
- * @param {*} itemName
+ * @param {String} itemName
  */
 const getPdsaItemModel = itemName =>
   ({
@@ -56,81 +56,55 @@ export const create = async (req, res) => {
   }
 };
 
-const undefinedNullOrEmpty = obj => {
-  if (obj === null || obj === undefined || obj.trim() === '') return true;
-  return false;
+/**
+ * Send the paginated results back to the client. They need to specify limit and page in the Request.query
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Mongoose Model} ItemModel
+ */
+export const sendPaginatedResults = async (req, res, ItemModel) => {
+  try {
+    const options = {
+      populate: ['primarySkillAreas', 'secondarySkillAreas', 'program', 'institution']
+    };
+    if (!undefinedNullOrEmpty(req.query.page) && !undefinedNullOrEmpty(req.query.limit)) {
+      options.page = req.query.page;
+      options.limit = req.query.limit;
+    }
+
+    const results = await ItemModel.paginate(mongooseQueryBuilderForFilter(req.query), options);
+
+    res.status(200).send(results);
+  } catch (e) {
+    res.status(500).send(`Error: ${e}`);
+  }
 };
 
-const mongooseExactMatchQueryBuilder = urlQuery => {
-  const query = {};
-  // add a filter for name
-  if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
+/**
+ * Sends an object to the client containing all the results matching the filters in the 'docs' field and the number of docs being returned in the 'totalDocs' field
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} ItemModel
+ */
+export const sendAllResults = async (req, res, ItemModel) => {
+  try {
+    const results = await ItemModel.find(mongooseQueryBuilderForFilter(req.query))
+      .populate('primarySkillAreas')
+      .populate('secondarySkillAreas')
+      .populate('institution')
+      .populate('program')
+      .exec();
 
-  // add filters for skills -> matches primary skill area ids
-  // user can pass in a list of ids separated via commas, split them and trim all whitespace
-  if (!undefinedNullOrEmpty(urlQuery.primarySkillAreas))
-    query.primarySkillAreas = {
-      $in: urlQuery.primarySkillAreas.split(',').map(e => e.trim())
+    const resultsWithMetadata = {
+      docs: results,
+      totalDocs: results.length
     };
-  if (!undefinedNullOrEmpty(urlQuery.secondarySkillAreas))
-    query.secondarySkillAreas = {
-      $in: urlQuery.secondarySkillAreas.split(',').map(e => e.trim())
-    };
-
-  // add filters for cost
-  if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
-  if (!undefinedNullOrEmpty(urlQuery.maxCost)) query['cost.maxCost'] = urlQuery.maxCost;
-  if (!undefinedNullOrEmpty(urlQuery.currency))
-    query['cost.currency'] = urlQuery.currency.toUpperCase();
-  if (
-    !undefinedNullOrEmpty(urlQuery.groupPricingAvailable) &&
-    (urlQuery.groupPricingAvailable.trim().toLowerCase() === 'true' ||
-      urlQuery.groupPricingAvailable.trim().toLowerCase() === 'false')
-  )
-    query['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
-
-  // add filters for location
-  if (!undefinedNullOrEmpty(urlQuery.country)) query['location.country'] = urlQuery.country;
-  if (!undefinedNullOrEmpty(urlQuery.province)) query['location.province'] = urlQuery.province;
-  if (!undefinedNullOrEmpty(urlQuery.city)) query['location.city'] = urlQuery.city;
-
-  // add filters for deliveryMethod
-  if (!undefinedNullOrEmpty(urlQuery.deliveryMethod))
-    query.deliveryMethod = urlQuery.deliveryMethod;
-
-  // add filters for pdsa tier
-  if (!undefinedNullOrEmpty(urlQuery.startingPdsaTier))
-    query.startingPdsaTier = urlQuery.startingPdsaTier;
-
-  // add filters for visibility
-  if (!undefinedNullOrEmpty(urlQuery.visible)) query.visible = urlQuery.visible === 'true';
-
-  // add filters for institution and program
-  if (!undefinedNullOrEmpty(urlQuery.institution))
-    query.institution = mongoose.Types.ObjectId(urlQuery.institution);
-  if (!undefinedNullOrEmpty(urlQuery.program))
-    query.program = mongoose.Types.ObjectId(urlQuery.program);
-
-  // Filter via dates
-  if (!undefinedNullOrEmpty(urlQuery.startDate) && !undefinedNullOrEmpty(urlQuery.endDate)) {
-    const startDate = new Date(urlQuery.startDate);
-    const endDate = new Date(urlQuery.endDate);
-
-    query['notableDates.start'] = {
-      $gte: startDate,
-      $lte: endDate
-    };
-
-    query['notableDates.end'] = {
-      $gte: startDate,
-      $lte: endDate
-    };
+    res.status(200).send(resultsWithMetadata);
+  } catch (e) {
+    res.status(500).send(`Error: ${e}`);
   }
-
-  // TODO: add pagination
-
-  console.log(JSON.stringify(query));
-  return Object.entries(query).length > 0 ? query : null;
 };
 
 /**
@@ -143,17 +117,10 @@ export const find = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
   if (ItemModel !== null) {
-    try {
-      const results = await ItemModel.find(mongooseExactMatchQueryBuilder(req.query))
-        .populate('primarySkillAreas')
-        .populate('secondarySkillAreas')
-        .populate('institution')
-        .populate('program')
-        .exec();
-      res.status(200).send(results);
-    } catch (e) {
-      res.status(500).send(`Error: ${e}`);
-    }
+    // check if they are trying to get paginated results or not
+    if (!undefinedNullOrEmpty(req.query.page) && !undefinedNullOrEmpty(req.query.limit))
+      sendPaginatedResults(req, res, ItemModel);
+    else sendAllResults(req, res, ItemModel);
   } else {
     res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
