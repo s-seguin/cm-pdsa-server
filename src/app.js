@@ -37,8 +37,8 @@ app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/login', authRouter);
 
-app.use('/pdsa', /* isAuthenticated, */ pdsaCrudRouter);
-app.use('/metadata', /* isAuthenticated, */ metadataCrudRouter);
+app.use('/pdsa', isAuthenticated, pdsaCrudRouter);
+app.use('/metadata', isAuthenticated, metadataCrudRouter);
 
 app.use('/', isAuthenticated, indexRouter);
 
