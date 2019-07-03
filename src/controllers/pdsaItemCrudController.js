@@ -69,9 +69,13 @@ const mongooseExactMatchQueryBuilder = urlQuery => {
   // add filters for skills -> matches primary skill area ids
   // user can pass in a list of ids separated via commas, split them and trim all whitespace
   if (!undefinedNullOrEmpty(urlQuery.primarySkillAreas))
-    query.primarySkillAreas = { $in: urlQuery.primarySkillAreas.split(',').map(e => e.trim()) };
+    query.primarySkillAreas = {
+      $in: urlQuery.primarySkillAreas.split(',').map(e => e.trim())
+    };
   if (!undefinedNullOrEmpty(urlQuery.secondarySkillAreas))
-    query.secondarySkillAreas = { $in: urlQuery.secondarySkillAreas.split(',').map(e => e.trim()) };
+    query.secondarySkillAreas = {
+      $in: urlQuery.secondarySkillAreas.split(',').map(e => e.trim())
+    };
 
   // add filters for cost
   if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
@@ -106,6 +110,24 @@ const mongooseExactMatchQueryBuilder = urlQuery => {
     query.institution = mongoose.Types.ObjectId(urlQuery.institution);
   if (!undefinedNullOrEmpty(urlQuery.program))
     query.program = mongoose.Types.ObjectId(urlQuery.program);
+
+  // Filter via dates
+  if (!undefinedNullOrEmpty(urlQuery.startDate) && !undefinedNullOrEmpty(urlQuery.endDate)) {
+    const startDate = new Date(urlQuery.startDate);
+    const endDate = new Date(urlQuery.endDate);
+
+    query['notableDates.start'] = {
+      $gte: startDate,
+      $lte: endDate
+    };
+
+    query['notableDates.end'] = {
+      $gte: startDate,
+      $lte: endDate
+    };
+  }
+
+  // TODO: add pagination
 
   console.log(JSON.stringify(query));
   return Object.entries(query).length > 0 ? query : null;
@@ -168,7 +190,7 @@ export const update = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
     try {
-      const results = await ItemModel.update({ _id: req.params.id }, req.body);
+      const results = await ItemModel.updateOne({ _id: req.params.id }, req.body);
       res.status(201).send(results);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
