@@ -26,13 +26,13 @@ router.get(
   '/callback',
   passport.authenticate('openidconnect', { failureRedirect: '/auth/login' }),
   (req, res) => {
-    res.redirect('/');
+    res.status(200).redirect('/');
   }
 );
 
 // Fallback to login when invalid path is entered
 router.get('/', (req, res) => {
-  res.redirect('/auth/login');
+  res.status(307).redirect('/auth/login');
 });
 
 export default router;
