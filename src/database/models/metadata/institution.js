@@ -11,7 +11,7 @@ const institutionSchema = mongoose.Schema({
 });
 
 /**
- * Before an Institution is removed, remove all the Programs that are children of the specified Insitution (this._id)
+ * Before an Institution is removed, remove all the Programs that are children of the specified Institution (this._id)
  *
  * Simulates a On Delete Cascade functionality from SQL. Function is named an not an arrow function so that we can access 'this'
  */

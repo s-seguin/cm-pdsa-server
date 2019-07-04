@@ -1,16 +1,47 @@
+/**
+ * Check to make sure that an array isn't empty
+ * @param {Array} arr
+ */
+const notEmptyArrayValidator = arr => {
+  if (arr.length <= 0) return false;
+  return true;
+};
+
+/**
+ * Check to make sure the array of Primary or Secondary skill areas does not contain duplicate entries
+ * @param {Array} arr
+ */
+const noDuplicateValues = arr => {
+  for (let i = 0; i < arr.length; i += 1) {
+    for (let j = i + 1; j < arr.length; j += 1) {
+      if (JSON.stringify(arr[i]) === JSON.stringify(arr[j])) return false;
+    }
+  }
+  return true;
+};
+
+// The validator for skill areas arrays
+export const arrayValidator = [
+  { validator: notEmptyArrayValidator, msg: 'The supplied arrays of Skill Areas cannot be empty.' },
+  {
+    validator: noDuplicateValues,
+    msg: 'The supplied array of Skill Areas cannot contain duplicate entries.'
+  }
+];
+
 // //////////////////////// //
 // DELIVER METHOD VALIDATOR //
 // //////////////////////// //
-/** Custom validator to ensure PDSA Tier is a number between 1-4
- * [0] -> the function to validate the pdsaTier
+/** Custom validator to ensure the deliver method is either online, in-class, both
+ * [0] -> the function to validate the delivery method
  * [1] -> the error message is the validation is unsuccessful
  */
 export const deliveryMethodValidator = [
-  deliverMethod => {
-    if (['online', 'in-class', 'both'].includes(deliverMethod)) return false;
+  deliveryMethod => {
+    if (!['online', 'in-class', 'both'].includes(deliveryMethod)) return false;
     return true;
   },
-  'Invalid delivery method. Delivery Method can be Online, InClass or Both'
+  'Invalid delivery method. Delivery Method can be online, in-class or both'
 ];
 
 // /////////////////// //

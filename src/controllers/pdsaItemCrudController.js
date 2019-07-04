@@ -5,10 +5,11 @@ import Certification from '../database/models/types/certification';
 import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
+import { undefinedNullOrEmpty, createFilterForMongooseQuery } from './helpers/queryHelper';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
- * @param {*} itemName
+ * @param {String} itemName
  */
 const getPdsaItemModel = itemName =>
   ({
@@ -56,28 +57,70 @@ export const create = async (req, res) => {
 };
 
 /**
- * This is a generic find all, allows us to find all the documents of the specified type.
+ * Send the paginated results back to the client. They need to specify limit and page in the Request.query
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Mongoose Model} ItemModel
+ */
+export const sendPaginatedResults = async (req, res, ItemModel) => {
+  try {
+    const options = {
+      populate: ['primarySkillAreas', 'secondarySkillAreas', 'program', 'institution']
+    };
+    if (!undefinedNullOrEmpty(req.query.page) && !undefinedNullOrEmpty(req.query.limit)) {
+      options.page = req.query.page;
+      options.limit = req.query.limit;
+    }
+
+    const results = await ItemModel.paginate(createFilterForMongooseQuery(req.query), options);
+
+    res.status(200).send(results);
+  } catch (e) {
+    res.status(500).send(`Error: ${e}`);
+  }
+};
+
+/**
+ * Sends an object to the client containing all the results matching the filters in the 'docs' field and the number of docs being returned in the 'totalDocs' field
  *
  * @param {*} req
  * @param {*} res
+ * @param {*} ItemModel
+ */
+export const sendAllResults = async (req, res, ItemModel) => {
+  try {
+    const results = await ItemModel.find(createFilterForMongooseQuery(req.query))
+      .populate('primarySkillAreas')
+      .populate('secondarySkillAreas')
+      .populate('institution')
+      .populate('program')
+      .exec();
+
+    const resultsWithMetadata = {
+      docs: results,
+      totalDocs: results.length
+    };
+    res.status(200).send(resultsWithMetadata);
+  } catch (e) {
+    res.status(500).send(`Error: ${e}`);
+  }
+};
+
+/**
+ * This is a generic find all, allows us to find all the documents of the specified type.
+ *
+ * @param {Request} req
+ * @param {Response} res
  */
 export const find = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
 
   if (ItemModel !== null) {
-    try {
-      const results = await ItemModel.find()
-        .populate({
-          path: 'secondarySkillArea',
-          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-        })
-        .populate('institution')
-        .populate('program')
-        .exec();
-      res.status(200).send(results);
-    } catch (e) {
-      res.status(500).send(`Error: ${e}`);
-    }
+    // check if they are trying to get paginated results or not
+    if (!undefinedNullOrEmpty(req.query.page) && !undefinedNullOrEmpty(req.query.limit))
+      sendPaginatedResults(req, res, ItemModel);
+    else sendAllResults(req, res, ItemModel);
   } else {
     res.status(400).send(`Error: Provided paramter :type was incorrect`);
   }
@@ -114,7 +157,7 @@ export const update = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
     try {
-      const results = await ItemModel.update({ _id: req.params.id }, req.body);
+      const results = await ItemModel.updateOne({ _id: req.params.id }, req.body);
       res.status(201).send(results);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
