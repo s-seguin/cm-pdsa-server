@@ -74,7 +74,7 @@ export function isAuthenticated(req, res, next) {
   if (req.isAuthenticated() && typeof req.user !== 'undefined') {
     return next();
   }
-  return res.redirect('/auth/login');
+  return res.status(307).redirect('/auth/login');
 }
 
 /**
@@ -123,7 +123,7 @@ export function logout(req, res) {
   request.write(requestBody);
   request.end();
   req.logout();
-  res.send('Successfully Logged Out!');
+  res.status(200).send('Successfully Logged Out!');
 }
 
 export default router;
