@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 /**
  * Checks if an object is null, undefined or whitespace.
  * @param {Object} obj
@@ -13,8 +14,8 @@ export const undefinedNullOrEmpty = obj => {
  */
 export const createFilterForMongooseQuery = urlQuery => {
   const query = {};
-  // add a filter for name
-  if (!undefinedNullOrEmpty(urlQuery.name)) query.name = urlQuery.name;
+  // add a filter for search results
+  if (!undefinedNullOrEmpty(urlQuery.search)) query.$text = { $search: urlQuery.search };
 
   // add filters for skills -> matches primary skill area ids
   // user can pass in a list of ids separated via commas, split them and trim all whitespace
@@ -76,6 +77,8 @@ export const createFilterForMongooseQuery = urlQuery => {
       $lte: endDate
     };
   }
+
+  console.log(JSON.stringify(query));
 
   return Object.entries(query).length > 0 ? query : null;
 };

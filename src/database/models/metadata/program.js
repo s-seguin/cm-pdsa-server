@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
  * Primary and Secondary skills appear to be two separate list thus the two separate schemas.
  */
 const programSchema = mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, trim: true },
   institution: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Institution',

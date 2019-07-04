@@ -12,8 +12,8 @@ import PdsaItem from '../pdsaItem';
 const Book = PdsaItem.discriminator(
   'Book',
   new mongoose.Schema({
-    author: String,
-    publisher: String
+    author: { type: String, trim: true },
+    publisher: { type: String, trim: true }
   })
 );
 

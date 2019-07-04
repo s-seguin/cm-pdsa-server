@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
  * The reference to parentPrimarySkillArea is because the secondary skills belong to a primary skill.
  */
 const secondarySkillAreaSchema = mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, trim: true },
   parentPrimarySkillArea: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PrimarySkillArea',

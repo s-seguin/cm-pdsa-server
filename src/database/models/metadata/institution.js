@@ -7,7 +7,7 @@ import Program from './program';
  * We want to be able to quickly select and filter these so we are creating a schema to ensure they are all named correctly etc.
  */
 const institutionSchema = mongoose.Schema({
-  name: { type: String, required: true, unique: true }
+  name: { type: String, required: true, unique: true, trim: true }
 });
 
 /**
