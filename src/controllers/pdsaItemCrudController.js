@@ -73,7 +73,10 @@ export const sendPaginatedResults = async (req, res, ItemModel) => {
       options.limit = req.query.limit;
     }
 
-    const results = await ItemModel.paginate(createFilterForMongooseQuery(req.query), options);
+    const results = await ItemModel.paginate(
+      await createFilterForMongooseQuery(req.query),
+      options
+    );
 
     res.status(200).send(results);
   } catch (e) {
@@ -90,7 +93,7 @@ export const sendPaginatedResults = async (req, res, ItemModel) => {
  */
 export const sendAllResults = async (req, res, ItemModel) => {
   try {
-    const results = await ItemModel.find(createFilterForMongooseQuery(req.query))
+    const results = await ItemModel.find(await createFilterForMongooseQuery(req.query))
       .populate('primarySkillAreas')
       .populate('secondarySkillAreas')
       .populate('institution')

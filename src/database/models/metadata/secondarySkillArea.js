@@ -32,6 +32,7 @@ secondarySkillAreaSchema.pre('save', async function ensureUnique(next) {
   return next();
 });
 
+secondarySkillAreaSchema.index({ name: 'text' });
 const SecondarySkillArea = mongoose.model('SecondarySkillArea', secondarySkillAreaSchema);
 
 export default SecondarySkillArea;

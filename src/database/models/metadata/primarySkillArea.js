@@ -27,6 +27,7 @@ primarySkillAreaSchema.pre('remove', async function cascadeDeleteChildren(next) 
   }
 });
 
+primarySkillAreaSchema.index({ name: 'text' });
 const PrimarySkillArea = mongoose.model('PrimarySkillArea', primarySkillAreaSchema);
 
 export default PrimarySkillArea;

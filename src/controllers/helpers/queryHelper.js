@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import SecondarySkillArea from '../../database/models/metadata/secondarySkillArea';
+import PrimarySkillArea from '../../database/models/metadata/primarySkillArea';
 /**
  * Checks if an object is null, undefined or whitespace.
  * @param {Object} obj
@@ -9,13 +11,40 @@ export const undefinedNullOrEmpty = obj => {
 };
 
 /**
+ * Return an array of all the ids where SecondarySkillArea names (via text index) match the searchQuery
+ *
+ * @param {String} searchQuery the query we are comparing our SecondarySkillAreas names too
+ */
+export const searchSecondarySkills = async searchQuery => {
+  const matchingSecondarySkillIds = await SecondarySkillArea.find({
+    $text: { $search: searchQuery }
+  }).select('_id');
+
+  return matchingSecondarySkillIds.map(o => o._id);
+};
+
+/**
+ * Return an array of all the ids where PrimarySkillArea names (via text index) match the searchQuery
+ *
+ * @param {String} searchQuery the query we are comparing our PrimarySkillArea names too
+ */
+export const searchPrimarySkills = async searchQuery => {
+  const matchingPrimarySkillIds = await PrimarySkillArea.find({
+    $text: { $search: searchQuery }
+  }).select('_id');
+
+  console.log(matchingPrimarySkillIds);
+  return matchingPrimarySkillIds.map(o => o._id);
+};
+
+/**
  * Creates an object to filter Mongoose queries based on the parameters passed in the Request.query
  * @param {Request.query} urlQuery
  */
-export const createFilterForMongooseQuery = urlQuery => {
+export const createFilterForMongooseQuery = async urlQuery => {
   const query = {};
-  // add a filter for search results
-  if (!undefinedNullOrEmpty(urlQuery.search)) query.$text = { $search: urlQuery.search };
+  let searching = false;
+  const searchQ = { $or: [] };
 
   // add filters for skills -> matches primary skill area ids
   // user can pass in a list of ids separated via commas, split them and trim all whitespace
@@ -27,6 +56,37 @@ export const createFilterForMongooseQuery = urlQuery => {
     query.secondarySkillAreas = {
       $in: urlQuery.secondarySkillAreas.split(',').map(e => e.trim())
     };
+
+  // add a filter for search results
+  // if searching and primary skill area and secondary skill areas aren't set, search across all three
+  // else search across name and unset skill areas
+  // query is an OR -> Get all items where name matches search OR primarySkillAreas matches search OR secondarySkillAreas matches search
+  if (!undefinedNullOrEmpty(urlQuery.search)) {
+    searching = true;
+
+    // add name to search query (uses text index)
+    searchQ.$or.push({ $text: { $search: urlQuery.search } });
+
+    // add primary skills if we aren't filtering by them already
+    if (!query.primarySkillAreas) {
+      const matchingPrimarySkillIds = await searchPrimarySkills(urlQuery.search);
+      searchQ.$or.push({
+        primarySkillAreas: {
+          $in: matchingPrimarySkillIds
+        }
+      });
+    }
+
+    // add secondary skills if we aren't filtering by them already
+    if (!query.secondarySkillAreas) {
+      const matchingSecondarySkillIds = await searchSecondarySkills(urlQuery.search);
+      searchQ.$or.push({
+        secondarySkillAreas: {
+          $in: matchingSecondarySkillIds
+        }
+      });
+    }
+  }
 
   // add filters for cost
   if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
@@ -80,5 +140,15 @@ export const createFilterForMongooseQuery = urlQuery => {
 
   console.log(JSON.stringify(query));
 
+  if (searching && Object.entries(query).length > 0) {
+    console.log(JSON.stringify({ $and: [query, searchQ] }));
+
+    return { $and: [query, searchQ] };
+  }
+  if (searching) {
+    console.log(JSON.stringify(searchQ));
+
+    return searchQ;
+  }
   return Object.entries(query).length > 0 ? query : null;
 };

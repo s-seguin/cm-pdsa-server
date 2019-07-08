@@ -79,7 +79,11 @@ const pdsaItemSchema = mongoose.Schema({
   visible: { type: Boolean, required: true }
 });
 
+// create indexes so we can search and join results with an OR
 pdsaItemSchema.index({ name: 'text' });
+pdsaItemSchema.index({ secondarySkillAreas: 1 });
+pdsaItemSchema.index({ primarySkillAreas: 1 });
+
 pdsaItemSchema.plugin(mongoosePaginate);
 
 const PdsaItem = mongoose.model('PdsaItem', pdsaItemSchema);
