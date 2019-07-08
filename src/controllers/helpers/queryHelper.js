@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
-import SecondarySkillArea from '../../database/models/metadata/secondarySkillArea';
-import PrimarySkillArea from '../../database/models/metadata/primarySkillArea';
+import {
+  getIdsOfSecondarySkillsMatchingSearch,
+  getIdsOfPrimarySkillsMatchingSearch
+} from './searchHelper';
 /**
  * Checks if an object is null, undefined or whitespace.
  * @param {Object} obj
@@ -11,49 +13,22 @@ export const undefinedNullOrEmpty = obj => {
 };
 
 /**
- * Return an array of all the ids where SecondarySkillArea names (via text index) match the searchQuery
- *
- * @param {String} searchQuery the query we are comparing our SecondarySkillAreas names too
- */
-export const searchSecondarySkills = async searchQuery => {
-  const matchingSecondarySkillIds = await SecondarySkillArea.find({
-    $text: { $search: searchQuery }
-  }).select('_id');
-
-  return matchingSecondarySkillIds.map(o => o._id);
-};
-
-/**
- * Return an array of all the ids where PrimarySkillArea names (via text index) match the searchQuery
- *
- * @param {String} searchQuery the query we are comparing our PrimarySkillArea names too
- */
-export const searchPrimarySkills = async searchQuery => {
-  const matchingPrimarySkillIds = await PrimarySkillArea.find({
-    $text: { $search: searchQuery }
-  }).select('_id');
-
-  console.log(matchingPrimarySkillIds);
-  return matchingPrimarySkillIds.map(o => o._id);
-};
-
-/**
  * Creates an object to filter Mongoose queries based on the parameters passed in the Request.query
  * @param {Request.query} urlQuery
  */
 export const createFilterForMongooseQuery = async urlQuery => {
-  const query = {};
+  const mongooseQuery = {};
   let searching = false;
-  const searchQ = { $or: [] };
+  const mongooseSearchQuery = { $or: [] };
 
   // add filters for skills -> matches primary skill area ids
   // user can pass in a list of ids separated via commas, split them and trim all whitespace
   if (!undefinedNullOrEmpty(urlQuery.primarySkillAreas))
-    query.primarySkillAreas = {
+    mongooseQuery.primarySkillAreas = {
       $in: urlQuery.primarySkillAreas.split(',').map(e => e.trim())
     };
   if (!undefinedNullOrEmpty(urlQuery.secondarySkillAreas))
-    query.secondarySkillAreas = {
+    mongooseQuery.secondarySkillAreas = {
       $in: urlQuery.secondarySkillAreas.split(',').map(e => e.trim())
     };
 
@@ -65,12 +40,12 @@ export const createFilterForMongooseQuery = async urlQuery => {
     searching = true;
 
     // add name to search query (uses text index)
-    searchQ.$or.push({ $text: { $search: urlQuery.search } });
+    mongooseSearchQuery.$or.push({ $text: { $search: urlQuery.search } });
 
     // add primary skills if we aren't filtering by them already
-    if (!query.primarySkillAreas) {
-      const matchingPrimarySkillIds = await searchPrimarySkills(urlQuery.search);
-      searchQ.$or.push({
+    if (!mongooseQuery.primarySkillAreas) {
+      const matchingPrimarySkillIds = await getIdsOfPrimarySkillsMatchingSearch(urlQuery.search);
+      mongooseSearchQuery.$or.push({
         primarySkillAreas: {
           $in: matchingPrimarySkillIds
         }
@@ -78,9 +53,11 @@ export const createFilterForMongooseQuery = async urlQuery => {
     }
 
     // add secondary skills if we aren't filtering by them already
-    if (!query.secondarySkillAreas) {
-      const matchingSecondarySkillIds = await searchSecondarySkills(urlQuery.search);
-      searchQ.$or.push({
+    if (!mongooseQuery.secondarySkillAreas) {
+      const matchingSecondarySkillIds = await getIdsOfSecondarySkillsMatchingSearch(
+        urlQuery.search
+      );
+      mongooseSearchQuery.$or.push({
         secondarySkillAreas: {
           $in: matchingSecondarySkillIds
         }
@@ -89,66 +66,64 @@ export const createFilterForMongooseQuery = async urlQuery => {
   }
 
   // add filters for cost
-  if (!undefinedNullOrEmpty(urlQuery.minCost)) query['cost.minCost'] = urlQuery.minCost;
-  if (!undefinedNullOrEmpty(urlQuery.maxCost)) query['cost.maxCost'] = urlQuery.maxCost;
+  if (!undefinedNullOrEmpty(urlQuery.minCost)) mongooseQuery['cost.minCost'] = urlQuery.minCost;
+  if (!undefinedNullOrEmpty(urlQuery.maxCost)) mongooseQuery['cost.maxCost'] = urlQuery.maxCost;
   if (!undefinedNullOrEmpty(urlQuery.currency))
-    query['cost.currency'] = urlQuery.currency.toUpperCase();
+    mongooseQuery['cost.currency'] = urlQuery.currency.toUpperCase();
   if (
     !undefinedNullOrEmpty(urlQuery.groupPricingAvailable) &&
     (urlQuery.groupPricingAvailable.trim().toLowerCase() === 'true' ||
       urlQuery.groupPricingAvailable.trim().toLowerCase() === 'false')
   )
-    query['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
+    mongooseQuery['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
 
   // add filters for location
-  if (!undefinedNullOrEmpty(urlQuery.country)) query['location.country'] = urlQuery.country;
-  if (!undefinedNullOrEmpty(urlQuery.province)) query['location.province'] = urlQuery.province;
-  if (!undefinedNullOrEmpty(urlQuery.city)) query['location.city'] = urlQuery.city;
+  if (!undefinedNullOrEmpty(urlQuery.country)) mongooseQuery['location.country'] = urlQuery.country;
+  if (!undefinedNullOrEmpty(urlQuery.province))
+    mongooseQuery['location.province'] = urlQuery.province;
+  if (!undefinedNullOrEmpty(urlQuery.city)) mongooseQuery['location.city'] = urlQuery.city;
 
   // add filters for deliveryMethod
   if (!undefinedNullOrEmpty(urlQuery.deliveryMethod))
-    query.deliveryMethod = urlQuery.deliveryMethod;
+    mongooseQuery.deliveryMethod = urlQuery.deliveryMethod;
 
   // add filters for pdsa tier
   if (!undefinedNullOrEmpty(urlQuery.startingPdsaTier))
-    query.startingPdsaTier = urlQuery.startingPdsaTier;
+    mongooseQuery.startingPdsaTier = urlQuery.startingPdsaTier;
 
   // add filters for visibility
-  if (!undefinedNullOrEmpty(urlQuery.visible)) query.visible = urlQuery.visible === 'true';
+  if (!undefinedNullOrEmpty(urlQuery.visible)) mongooseQuery.visible = urlQuery.visible === 'true';
 
   // add filters for institution and program
   if (!undefinedNullOrEmpty(urlQuery.institution))
-    query.institution = mongoose.Types.ObjectId(urlQuery.institution);
+    mongooseQuery.institution = mongoose.Types.ObjectId(urlQuery.institution);
   if (!undefinedNullOrEmpty(urlQuery.program))
-    query.program = mongoose.Types.ObjectId(urlQuery.program);
+    mongooseQuery.program = mongoose.Types.ObjectId(urlQuery.program);
 
   // Filter via dates
   if (!undefinedNullOrEmpty(urlQuery.startDate) && !undefinedNullOrEmpty(urlQuery.endDate)) {
     const startDate = new Date(urlQuery.startDate);
     const endDate = new Date(urlQuery.endDate);
 
-    query['notableDates.start'] = {
+    mongooseQuery['notableDates.start'] = {
       $gte: startDate,
       $lte: endDate
     };
 
-    query['notableDates.end'] = {
+    mongooseQuery['notableDates.end'] = {
       $gte: startDate,
       $lte: endDate
     };
   }
 
-  console.log(JSON.stringify(query));
-
-  if (searching && Object.entries(query).length > 0) {
-    console.log(JSON.stringify({ $and: [query, searchQ] }));
-
-    return { $and: [query, searchQ] };
+  // if we are searching and filtering, the query to return is searchQuery AND mongooseQuery
+  if (searching && Object.entries(mongooseQuery).length > 0) {
+    return { $and: [mongooseQuery, mongooseSearchQuery] };
   }
+  // if we are only searching, just return the searchQuery
   if (searching) {
-    console.log(JSON.stringify(searchQ));
-
-    return searchQ;
+    return mongooseSearchQuery;
   }
-  return Object.entries(query).length > 0 ? query : null;
+  // otherwise, if we are not searching either return the filtered query or null
+  return Object.entries(mongooseQuery).length > 0 ? mongooseQuery : null;
 };
