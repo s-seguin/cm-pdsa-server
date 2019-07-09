@@ -31,7 +31,7 @@ import { pdsaTierValidator, costValidator, arrayValidator } from './validation';
  * */
 
 const pdsaItemSchema = mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, trim: true, required: true },
   // We include both primarySkillArea and secondarySkillArea (even though secondary has a reference to its primary) to improve query times
   primarySkillAreas: {
     type: [
@@ -55,7 +55,7 @@ const pdsaItemSchema = mongoose.Schema({
     required: true,
     validate: arrayValidator
   },
-  url: { type: String, required: true },
+  url: { type: String, trim: true, required: true },
   startingPdsaTier: { type: Number, required: true, validate: pdsaTierValidator },
   cost: {
     type: {
@@ -78,6 +78,11 @@ const pdsaItemSchema = mongoose.Schema({
   comments: String,
   visible: { type: Boolean, required: true }
 });
+
+// create indexes so we can search and join results with an OR
+pdsaItemSchema.index({ name: 'text' });
+pdsaItemSchema.index({ secondarySkillAreas: 1 });
+pdsaItemSchema.index({ primarySkillAreas: 1 });
 
 pdsaItemSchema.plugin(mongoosePaginate);
 

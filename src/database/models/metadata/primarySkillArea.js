@@ -7,7 +7,7 @@ import SecondarySkillArea from './secondarySkillArea';
  * Primary and Secondary skills appear to be two separate list thus the two separate schemas.
  */
 const primarySkillAreaSchema = mongoose.Schema({
-  name: { type: String, required: true, unique: true }
+  name: { type: String, required: true, unique: true, trim: true }
 });
 
 /**
@@ -27,6 +27,7 @@ primarySkillAreaSchema.pre('remove', async function cascadeDeleteChildren(next) 
   }
 });
 
+primarySkillAreaSchema.index({ name: 'text' });
 const PrimarySkillArea = mongoose.model('PrimarySkillArea', primarySkillAreaSchema);
 
 export default PrimarySkillArea;
