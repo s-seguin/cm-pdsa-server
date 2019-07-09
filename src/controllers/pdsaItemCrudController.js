@@ -171,7 +171,7 @@ export const update = async (req, res) => {
 };
 
 /**
- * Update the specified pdsa item (specified by id) with the object sent in the request body
+ * Delete the specified pdsa item (specified by id) with the object sent in the request body
  * @param {Request} req
  * @param {Response} res
  */
@@ -190,7 +190,7 @@ export const deleteItem = async (req, res) => {
 };
 
 /**
- * Update the specified pdsa item (specified by id) with the object sent in the request body
+ * Delete the specified pdsa items, where the ids of objects to delete is stored in the ids array in the body of the request.
  * @param {Request} req
  * @param {Response} res
  */
@@ -198,13 +198,23 @@ export const deleteMany = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
     try {
-      let delRes = null;
-      if (req.query.ids === undefined) delRes = await ItemModel.deleteMany();
-      else {
-        const ids = req.query.ids.split(',');
-        delRes = await ItemModel.deleteMany({ _id: { $in: ids } });
+      // check if it is a batch delete
+      if (req.body.ids && req.body.ids.length > 1) {
+        const delRes = await ItemModel.deleteMany({ _id: { $in: req.body.ids } });
+        res.status(200).send(delRes);
+      } else if (req.body.ids && req.body.ids.length === 1) {
+        res
+          .status(400)
+          .send(
+            `Error: to delete a single resource use root/pdsa/:type/:id, where type is the plural form of the resource :type you are trying to delete and :id is the id of resource you are trying to delete.`
+          );
+      } else {
+        res
+          .status(400)
+          .send(
+            `Error: Array of ids to delete is null or empty. You must provide a list of ids to delete in the body of your request as 'ids'. `
+          );
       }
-      res.status(200).send(delRes);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
