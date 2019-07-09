@@ -1,5 +1,12 @@
 import express from 'express';
-import { create, find, findById, update, deleteItem } from '../controllers/pdsaItemCrudController';
+import {
+  create,
+  find,
+  findById,
+  update,
+  deleteItem,
+  deleteMany
+} from '../controllers/pdsaItemCrudController';
 
 const router = express.Router();
 
@@ -43,5 +50,7 @@ router.patch('/:type/:id', update);
  * Delete the PDSA item specified by type and id
  */
 router.delete('/:type/:id', deleteItem);
+
+router.post('/:type/batch-delete', deleteMany);
 
 export default router;
