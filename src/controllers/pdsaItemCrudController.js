@@ -171,6 +171,43 @@ export const update = async (req, res) => {
 };
 
 /**
+ * Update the PDSA items specified by the type and ids. The list of ids to update is in req.body.ids and the updates to be performed are in req.body.updates
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const updateMany = async (req, res) => {
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    try {
+      if (req.body.ids && req.body.ids.length > 1) {
+        const results = await ItemModel.updateMany(
+          { _id: { $in: req.body.ids } },
+          req.body.updates
+        );
+        res.status(201).send(results);
+      } else if (req.body.ids && req.body.ids.length === 1) {
+        res
+          .status(400)
+          .send(
+            `Error: to update a single resource use PUT or PATCH root/pdsa/:type/:id, where type is the plural form of the resource :type you are trying to update and :id is the id of resource you are trying to update.`
+          );
+      } else {
+        res
+          .status(400)
+          .send(
+            `Error: Array of ids to delete is null or empty. You must provide a list of ids to delete in the body of your request as 'ids'. And the updates in req.body.updates`
+          );
+      }
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
  * Delete the specified pdsa item (specified by id) with the object sent in the request body
  * @param {Request} req
  * @param {Response} res
@@ -206,7 +243,7 @@ export const deleteMany = async (req, res) => {
         res
           .status(400)
           .send(
-            `Error: to delete a single resource use root/pdsa/:type/:id, where type is the plural form of the resource :type you are trying to delete and :id is the id of resource you are trying to delete.`
+            `Error: to delete a single resource use DELETE root/pdsa/:type/:id, where type is the plural form of the resource :type you are trying to delete and :id is the id of resource you are trying to delete.`
           );
       } else {
         res

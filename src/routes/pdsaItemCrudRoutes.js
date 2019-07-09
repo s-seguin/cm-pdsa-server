@@ -5,7 +5,8 @@ import {
   findById,
   update,
   deleteItem,
-  deleteMany
+  deleteMany,
+  updateMany
 } from '../controllers/pdsaItemCrudController';
 
 const router = express.Router();
@@ -51,9 +52,17 @@ router.patch('/:type/:id', update);
  */
 router.delete('/:type/:id', deleteItem);
 
+// //////////////// //
+// BATCH OPERATIONS //
+// //////////////// //
 /**
  * Delete the PDSA items specified by type and ids (in req.body.ids)
  */
 router.post('/:type/batch-delete', deleteMany);
+
+/**
+ * Update the PDSA items specified by the type and ids. The list of ids to update is in req.body.ids and the updates to be performed are in req.body.updates
+ */
+router.post('/:type/batch-update', updateMany);
 
 export default router;
