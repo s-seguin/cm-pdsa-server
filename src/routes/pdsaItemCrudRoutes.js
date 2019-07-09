@@ -51,6 +51,9 @@ router.patch('/:type/:id', update);
  */
 router.delete('/:type/:id', deleteItem);
 
+/**
+ * Delete the PDSA items specified by type and ids (in req.body.ids)
+ */
 router.post('/:type/batch-delete', deleteMany);
 
 export default router;

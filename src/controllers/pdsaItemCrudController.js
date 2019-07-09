@@ -198,6 +198,7 @@ export const deleteMany = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
     try {
+      // check if it is a batch delete
       if (req.body.ids && req.body.ids.length > 1) {
         const delRes = await ItemModel.deleteMany({ _id: { $in: req.body.ids } });
         res.status(200).send(delRes);
