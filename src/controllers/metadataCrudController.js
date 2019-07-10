@@ -2,6 +2,7 @@ import PrimarySkillArea from '../database/models/metadata/primarySkillArea';
 import SecondarySkillArea from '../database/models/metadata/secondarySkillArea';
 import Institution from '../database/models/metadata/institution';
 import Program from '../database/models/metadata/program';
+import PdsaItem from '../database/models/pdsaItem';
 
 /**
  * Return the matching Model from the provided itemName, if it doesn't match anything return null
@@ -204,10 +205,37 @@ export const updateMetadataById = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
   if (MetadataModel !== null) {
     try {
+      // if the metadata is a skill area, grab its old name
+      let oldName = '';
+      if (MetadataModel === PrimarySkillArea || MetadataModel === SecondarySkillArea)
+        oldName = (await MetadataModel.findById(req.params.id).exec()).name;
+
+      // update the metadata
       const updateRes = await MetadataModel.update({ _id: req.params.id }, req.body, {
         runValidators: true
       });
-      res.status(201).send(updateRes);
+
+      if (updateRes.nModified > 0) {
+        // we successfully updated the name of this piece of metadata if its a skill area, update the sort key
+        // keep track of how many keys we are updating to pass to the client
+        let updatedKeyCount = 0;
+        if (oldName && PrimarySkillArea) {
+          updatedKeyCount = (await PdsaItem.update(
+            { primarySkillAreaSortKey: oldName },
+            { primarySkillAreaSortKey: req.body.name }
+          )).nModified;
+        } else if (oldName && SecondarySkillArea) {
+          updatedKeyCount = (await PdsaItem.update(
+            { secondarySkillAreaSortKey: oldName },
+            { secondarySkillAreaSortKey: req.body.name }
+          )).nModified;
+        }
+
+        updateRes.nSortKeysUpdated = updatedKeyCount;
+        res.status(201).send(updateRes);
+      } else {
+        res.status(200).send(updateRes);
+      }
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }

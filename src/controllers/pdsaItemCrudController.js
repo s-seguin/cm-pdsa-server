@@ -6,6 +6,8 @@ import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
 import { undefinedNullOrEmpty, createFilterForMongooseQuery } from './helpers/queryHelper';
+import PrimarySkillArea from '../database/models/metadata/primarySkillArea';
+import SecondarySkillArea from '../database/models/metadata/secondarySkillArea';
 
 /**
  * Return the match PdsaItem Model from the provided itemName, if it doesn't match anything return null
@@ -36,10 +38,22 @@ export const create = async (req, res) => {
 
   // We are a not allowed to create Generic PdsaItems, use type Other instead.
   if (ItemModel !== null && ItemModel !== PdsaItem) {
-    // we need to instantiate a new Object of type determined by the pdsaItemSwitch
-    const instantiatedItem = new ItemModel(req.body);
-
     try {
+      // Add the sort keys to the item
+      if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0) {
+        req.body.primarySkillAreaSortKey = (await PrimarySkillArea.findById(
+          req.body.primarySkillAreas[0]
+        )).name;
+      }
+      if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0) {
+        req.body.secondarySkillAreaSortKey = (await SecondarySkillArea.findById(
+          req.body.secondarySkillAreas[0]
+        )).name;
+      }
+
+      // we need to instantiate a new Object of type determined by the pdsaItemSwitch
+      const instantiatedItem = new ItemModel(req.body);
+
       const result = await instantiatedItem.save();
       res.status(201).send(result);
     } catch (e) {
@@ -98,6 +112,7 @@ export const sendAllResults = async (req, res, ItemModel) => {
       .populate('secondarySkillAreas')
       .populate('institution')
       .populate('program')
+      .sort({ 'institution.name': 1 })
       .exec();
 
     const resultsWithMetadata = {
@@ -160,10 +175,33 @@ export const update = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
     try {
-      const results = await ItemModel.updateOne({ _id: req.params.id }, req.body, {
-        runValidators: true
-      });
-      res.status(201).send(results);
+      // if they are trying to update the sort keys send an error
+      if (req.body.primarySkillAreaSortKey || req.body.secondarySkillAreaSortKey) {
+        res
+          .status(403)
+          .send(
+            `Error: You are forbidden from modifying the sort keys for this object. They are automatically updated based on the primary and secondary skill areas of this object.`
+          );
+      } else {
+        // check if they are updating the primary skill areas and update the sort key too
+        if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0) {
+          req.body.primarySkillAreaSortKey = (await PrimarySkillArea.findById(
+            req.body.primarySkillAreas[0]
+          )).name;
+        }
+
+        // check if they are updating the secondary skill areas and update the sort key too
+        if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0) {
+          req.body.secondarySkillAreaSortKey = (await SecondarySkillArea.findById(
+            req.body.secondarySkillAreas[0]
+          )).name;
+        }
+
+        const results = await ItemModel.updateOne({ _id: req.params.id }, req.body, {
+          runValidators: true
+        });
+        res.status(201).send(results);
+      }
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
@@ -183,15 +221,42 @@ export const updateMany = async (req, res) => {
   if (ItemModel !== null) {
     try {
       if (req.body.ids && req.body.ids.length > 1) {
-        const results = await ItemModel.updateMany(
-          { _id: { $in: req.body.ids } },
-          req.body.updates,
-          { runValidators: true }
-        );
-        res.status(201).send(results);
+        // if they are trying to update the sort keys send an error
+        if (
+          req.body.updates.primarySkillAreaSortKey ||
+          req.body.updates.secondarySkillAreaSortKey
+        ) {
+          res
+            .status(403)
+            .send(
+              `Error: You are forbidden from modifying the sort keys for this object. They are automatically updated based on the primary and secondary skill areas of this object.`
+            );
+        } else {
+          // check if they are updating the primary skill areas and update the sort key too
+          if (req.body.updates.primarySkillAreas && req.body.updates.primarySkillAreas.length > 0) {
+            req.body.updates.primarySkillAreaSortKey = (await PrimarySkillArea.findById(
+              req.body.updates.primarySkillAreas[0]
+            )).name;
+          }
+          // check if they are updating the secondary skill areas and update the sort key too
+          if (
+            req.body.updates.secondarySkillAreas &&
+            req.body.updates.secondarySkillAreas.length > 0
+          ) {
+            req.body.updates.secondarySkillAreaSortKey = (await SecondarySkillArea.findById(
+              req.body.updates.secondarySkillAreas[0]
+            )).name;
+          }
+          const results = await ItemModel.updateMany(
+            { _id: { $in: req.body.ids } },
+            req.body.updates,
+            { runValidators: true }
+          );
+          res.status(201).send(results);
+        }
       } else if (req.body.ids && req.body.ids.length === 1) {
         res
-          .status(400)
+          .status(403)
           .send(
             `Error: to update a single resource use PUT or PATCH root/pdsa/:type/:id, where type is the plural form of the resource :type you are trying to update and :id is the id of resource you are trying to update.`
           );
