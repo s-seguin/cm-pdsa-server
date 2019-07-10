@@ -204,7 +204,9 @@ export const updateMetadataById = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
   if (MetadataModel !== null) {
     try {
-      const updateRes = await MetadataModel.update({ _id: req.params.id }, req.body);
+      const updateRes = await MetadataModel.update({ _id: req.params.id }, req.body, {
+        runValidators: true
+      });
       res.status(201).send(updateRes);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);

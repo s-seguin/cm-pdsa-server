@@ -160,7 +160,9 @@ export const update = async (req, res) => {
   const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
   if (ItemModel !== null) {
     try {
-      const results = await ItemModel.updateOne({ _id: req.params.id }, req.body);
+      const results = await ItemModel.updateOne({ _id: req.params.id }, req.body, {
+        runValidators: true
+      });
       res.status(201).send(results);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
@@ -183,7 +185,8 @@ export const updateMany = async (req, res) => {
       if (req.body.ids && req.body.ids.length > 1) {
         const results = await ItemModel.updateMany(
           { _id: { $in: req.body.ids } },
-          req.body.updates
+          req.body.updates,
+          { runValidators: true }
         );
         res.status(201).send(results);
       } else if (req.body.ids && req.body.ids.length === 1) {
