@@ -5,7 +5,11 @@ import Certification from '../database/models/types/certification';
 import Conference from '../database/models/types/conference';
 import CourseSeminar from '../database/models/types/courseSeminar';
 import Other from '../database/models/types/other';
-import { undefinedNullOrEmpty, createFilterForMongooseQuery } from './helpers/queryHelper';
+import {
+  undefinedNullOrEmpty,
+  createFilterForMongooseQuery,
+  createSortForMongooseQuery
+} from './helpers/queryHelper';
 import PrimarySkillArea from '../database/models/metadata/primarySkillArea';
 import SecondarySkillArea from '../database/models/metadata/secondarySkillArea';
 
@@ -80,7 +84,8 @@ export const create = async (req, res) => {
 export const sendPaginatedResults = async (req, res, ItemModel) => {
   try {
     const options = {
-      populate: ['primarySkillAreas', 'secondarySkillAreas', 'program', 'institution']
+      populate: ['primarySkillAreas', 'secondarySkillAreas', 'program', 'institution'],
+      sort: createSortForMongooseQuery(req.query)
     };
     if (!undefinedNullOrEmpty(req.query.page) && !undefinedNullOrEmpty(req.query.limit)) {
       options.page = req.query.page;
@@ -112,7 +117,7 @@ export const sendAllResults = async (req, res, ItemModel) => {
       .populate('secondarySkillAreas')
       .populate('institution')
       .populate('program')
-      .sort({ 'institution.name': 1 })
+      .sort(createSortForMongooseQuery(req.query))
       .exec();
 
     const resultsWithMetadata = {
