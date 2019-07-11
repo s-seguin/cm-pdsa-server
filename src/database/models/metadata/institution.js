@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import Program from './program';
 
 /**
  * Institution is a schema to hold the various institutions offering Courses, Conferences, etc.
