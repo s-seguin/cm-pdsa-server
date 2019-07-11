@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import SecondarySkillArea from './secondarySkillArea';
 
 /**
  * A schema to hold the Primary Skill Areas that PDSA items an be a part of e.g. Leadership and Development, Human Resources

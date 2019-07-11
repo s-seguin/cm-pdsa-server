@@ -183,6 +183,11 @@ export const deleteMetadataById = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
   if (MetadataModel !== null) {
     try {
+      // if the metadata is a skill area, grab its old name
+      let oldName = '';
+      if (MetadataModel === PrimarySkillArea || MetadataModel === SecondarySkillArea)
+        oldName = (await MetadataModel.findById(req.params.id).exec()).name;
+
       // If it is an Institution or PrimarySkillArea delete the respective programs and secondarySkillAreas that reference object being deleted (aka Cascade Delete)
       // This logic resides in the controller and not the model so that we can return the number of children deleted to the client
       let childrenDeleted = 0;
@@ -197,7 +202,25 @@ export const deleteMetadataById = async (req, res) => {
 
       // Only return childrenDeleted if obj being deleted is an institution or primarySkillArea
       if (MetadataModel === Institution || MetadataModel === PrimarySkillArea)
-        delRes.childrenDeleted = childrenDeleted;
+        delRes.nChildrenDeleted = childrenDeleted;
+
+      // if we successfully delete a skill area update the sort key references that used it to be empty
+      if (delRes.deletedCount > 0) {
+        let updatedKeyCount = 0;
+        if (oldName && MetadataModel === PrimarySkillArea) {
+          updatedKeyCount = (await PdsaItem.update(
+            { primarySkillAreaSortKey: oldName },
+            { primarySkillAreaSortKey: '' }
+          )).nModified;
+        } else if (oldName && MetadataModel === SecondarySkillArea) {
+          updatedKeyCount = (await PdsaItem.update(
+            { secondarySkillAreaSortKey: oldName },
+            { secondarySkillAreaSortKey: '' }
+          )).nModified;
+        }
+
+        delRes.nSortKeysUpdated = updatedKeyCount;
+      }
 
       res.status(200).send(delRes);
     } catch (e) {
@@ -231,12 +254,12 @@ export const updateMetadataById = async (req, res) => {
         // we successfully updated the name of this piece of metadata if its a skill area, update the sort key
         // keep track of how many keys we are updating to pass to the client
         let updatedKeyCount = 0;
-        if (oldName && PrimarySkillArea) {
+        if (oldName && MetadataModel === PrimarySkillArea) {
           updatedKeyCount = (await PdsaItem.update(
             { primarySkillAreaSortKey: oldName },
             { primarySkillAreaSortKey: req.body.name }
           )).nModified;
-        } else if (oldName && SecondarySkillArea) {
+        } else if (oldName && MetadataModel === SecondarySkillArea) {
           updatedKeyCount = (await PdsaItem.update(
             { secondarySkillAreaSortKey: oldName },
             { secondarySkillAreaSortKey: req.body.name }
