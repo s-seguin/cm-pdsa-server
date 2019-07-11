@@ -182,12 +182,24 @@ export const findMetadataByParentId = async (req, res) => {
 export const deleteMetadataById = async (req, res) => {
   const MetadataModel = getMetadataModel(req.params.type.toLowerCase());
   if (MetadataModel !== null) {
-    // Find the item we want to delete
     try {
-      const itemToDelete = await MetadataModel.findById(req.params.id);
-      const delResults = await itemToDelete.remove();
+      // If it is an Institution or PrimarySkillArea delete the respective programs and secondarySkillAreas that reference object being deleted (aka Cascade Delete)
+      // This logic resides in the controller and not the model so that we can return the number of children deleted to the client
+      let childrenDeleted = 0;
+      if (MetadataModel === Institution)
+        childrenDeleted = (await Program.deleteMany({ institution: req.params.id })).deletedCount;
+      else if (MetadataModel === PrimarySkillArea)
+        childrenDeleted = (await SecondarySkillArea.deleteMany({
+          parentPrimarySkillArea: req.params.id
+        })).deletedCount;
 
-      res.status(200).send(delResults);
+      const delRes = await MetadataModel.deleteOne({ _id: req.params.id });
+
+      // Only return childrenDeleted if obj being deleted is an institution or primarySkillArea
+      if (MetadataModel === Institution || MetadataModel === PrimarySkillArea)
+        delRes.childrenDeleted = childrenDeleted;
+
+      res.status(200).send(delRes);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
