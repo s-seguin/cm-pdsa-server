@@ -33,7 +33,6 @@ const getPdsaItemModel = itemName =>
  *
  * This is a generic controller that looks at the PDSA type being requested through the url parameters
  *
- * TODO: Add validation that the data being received is correct. Will be done in models.
  * @param {*} req the request object
  * @param {*} res the response object
  */

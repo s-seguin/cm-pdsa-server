@@ -35,11 +35,13 @@ Database connects to local `test` MongoDB via Mongoose, connection is opened upo
 
 ## Models
 
+---
+
 ### Metadata
 
-#### PrimarySkillArea
+---
 
-##### Description
+#### PrimarySkillArea
 
 This model is used to store the different Primary Skill Areas.
 
@@ -85,8 +87,6 @@ To create a new `SecondarySkillArea` supply an object like:
 
 #### Institution
 
-##### Description
-
 This model is used to store the different Institutions.
 
 ##### Fields
@@ -131,9 +131,15 @@ To create a new `Program` supply an object like:
 
 ### PDSA Items
 
+---
+
 ## Endpoints
 
+---
+
 ### Metadata
+
+---
 
 #### Create
 
@@ -209,11 +215,325 @@ RESPONSE:
 
 #### Read
 
+##### Description
+
+These routes are used to find information about the metadata objects. You can query by `type`, `id`, `name` and by `parent-id`. Types can be one of the following `primary-skills`, `secondary-skills`, `programs` or `institutions`. Id must be a valid `ObjectId` for the metadata object being retrieved. Name matches to the name of the object being retrieved and parent-id must be a valid `ObjectId` of the parent object.
+
+##### URLS
+
+`HTTP GET http://cm-pdsa-server/metadata/:type` => Returns all metadata objects of specified type.
+
+`HTTP GET http://cm-pdsa-server/metadata/:type/:id` => Returns the metadata object matching specified type and id.
+
+`HTTP GET http://cm-pdsa-server/metadata/:type/name/:name` => Returns all metadata objects matching specified type and name (there should only be one object as names should be unique).
+
+`HTTP GET http://cm-pdsa-server/metadata/:type/parent-id/:parentId` => Returns all metadata objects matching specified type and parent-id.
+
+##### Parameters
+
+| Parameter    | Possible values                                                           |
+| ------------ | ------------------------------------------------------------------------- |
+| `:type`      | `primary-skills` `secondary-skills` `programs` `institutions`             |
+| `:id`        | Valid `ObjectId` for the metadata object to retrieve                      |
+| `:name`      | The name of the object to retrieve                                        |
+| `:parent-id` | The `ObjectId` of the parent object (`Institution` or `PrimarySkillArea`) |
+
+##### Body
+
+No request body should be supplied.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                                                                              |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updated successfully                  | `200` | Server responds with the object requested when specified by `id`. Otherwise an object containing `docs` which is an array of all objects (Mongo documents) matching the request and `totalDocs` which is the count of docs in `docs`. |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                   |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                               |
+
+##### Examples
+
+###### Retrieving all Institutions
+
+```Javascript
+DELETE 'http://cm-pdsa-server/metadata/institutions'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "_id": "5d28e2886778eb82b6ef13f1",
+            "name": "University of Calgary",
+            "__v": 0
+        },
+        {
+            "_id": "5d28e2e76778eb82b6ef13f2",
+            "name": "AWS",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 2
+}
+```
+
+###### Retrieving the 'University of Calgary' Institution by ID
+
+```Javascript
+DELETE 'http://cm-pdsa-server/metadata/institutions/5d28e2886778eb82b6ef13f1'
+```
+
+```Javascript
+RESPONSE:
+{
+    "_id": "5d28e2886778eb82b6ef13f1",
+    "name": "University of Calgary",
+    "__v": 0
+}
+```
+
+###### Retrieving the 'University of Calgary' Institution by name
+
+```Javascript
+DELETE 'http://cm-pdsa-server/metadata/institutions/name/University of Calgary'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "_id": "5d28e2886778eb82b6ef13f1",
+            "name": "University of Calgary",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 1
+}
+```
+
+###### Retrieving all programs offered by the 'University of Calgary'
+
+```Javascript
+DELETE 'http://cm-pdsa-server/metadata/programs/parent-id/5d28e2886778eb82b6ef13f1'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "_id": "5d0bbce9a4e95add5f4f82e2",
+            "name": "Computer Science",
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "__v": 0
+        },
+        {
+            "_id": "5d0bbcfaa4e95add5f4f82e3",
+            "name": "Bioscience",
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "__v": 0
+        },
+        {
+            "_id": "5d1633e79b382b9e4d360da8",
+            "name": "Certificate for Emerging Leaders",
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "__v": 0
+        }
+    ],
+    "totalDocs": 3
+}
+```
+
+###### Retrieving all SecondarySkillAreas under by the 'Learning and Development'
+
+```Javascript
+DELETE 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d27b965360bcc6761543637'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "_id": "5d28e5b66778eb82b6ef13f4",
+            "name": "Teamwork",
+            "parentPrimarySkillArea": {
+                "_id": "5d27b965360bcc6761543637",
+                "name": "Learning and Development",
+                "__v": 0
+            },
+            "__v": 0
+        }
+    ],
+    "totalDocs": 1
+}
+```
+
 #### Update
+
+##### Description
+
+This route is used to update an existing metadata object, specified by the type and id parameter in the URL. Types can be one of the following `primary-skills`, `secondary-skills`, `programs` or `institutions`, and id must be a valid `ObjectId` for the metadata object being updated.
+
+##### URLS
+
+`HTTP PATCH http://cm-pdsa-server/metadata/:type/:id`
+`HTTP PUT http://cm-pdsa-server/metadata/:type/:id`
+
+Use `PATCH` when updating some fields but not all. Use `PUT` when updating the entire object.
+
+##### Parameters
+
+| Parameter | Possible values                                               |
+| --------- | ------------------------------------------------------------- |
+| `:type`   | `primary-skills` `secondary-skills` `programs` `institutions` |
+| `:id`     | Valid `ObjectId` for the metadata object to update            |
+
+##### Body
+
+The request body is a JSON object containting the fields you wish to update and their new values. Please see documentation for metadata models, for possible fields to update.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updated successfully                  | `200` | Server responds an object containg number of objects matching the id: `n`, number of objects updated: `nModified`, if the request was completed succesfully: `ok` and the number of sort key updated on PDSA items: `nSortKeysUpdated` (used to sort PDSA items via skill areas, if no SortKeys were updated this field is not present) |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                                                                                                                     |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                                                                                                                                 |
+
+##### Examples
+
+###### Updating the Leadership and Development PrimarySkillArea with a new name
+
+```Javascript
+PATCH 'http://cm-pdsa-server/metadata/primary-skills/5d27b965360bcc6761543637'
+
+REQUEST.BODY:
+{
+    name: "Learning and Growth"
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "nModified": 1,
+    "ok": 1,
+    "nSortKeysUpdated": 3
+}
+```
+
+###### Successfully updating the Teamwork SecondarySkillArea with a new parentPrimarySkillArea
+
+```Javascript
+PATCH 'http://cm-pdsa-server/metadata/secondary-skills/5d27b993360bcc6761543638'
+
+REQUEST.BODY:
+{
+    parentPrimarySkillArea: "5d1e34439eda691c184246d4"
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "nModified": 1,
+    "ok": 1,
+    "nSortKeysUpdated": 3
+}
+```
+
+###### Trying to update the Teamwork SecondarySkillArea with the same parentPrimarySkillArea
+
+```Javascript
+PATCH 'http://cm-pdsa-server/metadata/secondary-skills/5d27b993360bcc6761543638'
+
+REQUEST.BODY:
+{
+    parentPrimarySkillArea: "5d1e34439eda691c184246d4"
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "nModified": 0,
+    "ok": 1
+}
+```
 
 #### Delete
 
+##### Description
+
+This route is used to force delete an existing metadata object, specified by the type and id parameter in the URL. Types can be one of the following `primary-skills`, `secondary-skills`, `programs` or `institutions`, and id must be a valid `ObjectId` for the metadata object being deleted.
+
+**Please note:**
+
+- The object will be completely deleted and cannot be recovered.
+- If the object is a `PrimarySkillArea` or `Institution` and has children referencing it, those children will also be deleted. (Similar to a SQL cascade delete)
+- If the object is a skill area and has other PDSAItems referencing it, those sort keys will be updated
+
+##### URLS
+
+`HTTP DELETE http://cm-pdsa-server/metadata/:type/:id`
+
+##### Parameters
+
+| Parameter | Possible values                                               |
+| --------- | ------------------------------------------------------------- |
+| `:type`   | `primary-skills` `secondary-skills` `programs` `institutions` |
+| `:id`     | Valid `ObjectId` for the metadata object to delete            |
+
+##### Body
+
+No request body should be supplied.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deleted successfully                  | `200` | Server responds with an object containing `n`: the number of objects matching the id, `ok`: if the query executed ok, `deletedCount`: how many items matching _id_ were deleted, `nChildrenDeleted`: if type was _primary-skills_ or _institutions_ and there were children referencing the object we deleted, how many children were deleted also, `nSortKeysUpdated`: if the metadata object was a sill area and had sort keys referencing it, how many of those were updated. |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+##### Examples
+
+###### Deleting the 'Learning and Growth' PrimarySkillArea
+
+```Javascript
+DELETE 'http://cm-pdsa-server/metadata/primary-skills/5d27b965360bcc6761543637'
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "ok": 1,
+    "deletedCount": 1,
+    "nChildrenDeleted": 1
+}
+```
+
 ### PDSA
+
+---
 
 #### Create
 

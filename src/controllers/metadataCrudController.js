@@ -61,8 +61,11 @@ export const findMetadata = async (req, res) => {
         .populate('institution')
         .populate('program')
         .exec();
-
-      res.status(200).send(results);
+      const retObj = {
+        docs: results,
+        totalDocs: results.length
+      };
+      res.status(200).send(retObj);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
@@ -121,8 +124,11 @@ export const findMetadataByName = async (req, res) => {
         .populate('institution')
         .populate('program')
         .exec();
-
-      res.status(200).send(results);
+      const retObj = {
+        docs: results,
+        totalDocs: results.length
+      };
+      res.status(200).send(retObj);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
@@ -159,8 +165,11 @@ export const findMetadataByParentId = async (req, res) => {
         .populate('institution')
         .populate('program')
         .exec();
-
-      res.status(200).send(results);
+      const retObj = {
+        docs: results,
+        totalDocs: results.length
+      };
+      res.status(200).send(retObj);
     } catch (e) {
       res.status(500).send(`Error: ${e}`);
     }
@@ -204,7 +213,8 @@ export const deleteMetadataById = async (req, res) => {
       if (MetadataModel === Institution || MetadataModel === PrimarySkillArea)
         delRes.nChildrenDeleted = childrenDeleted;
 
-      // if we successfully delete a skill area update the sort key references that used it to be empty
+      // if we successfully delete a skill area update the sort key references that used it to be empty or if the item has another skill area, the next one
+      // TODO: check if the item we are deleting has other skill areas we can updated the sort key too
       if (delRes.deletedCount > 0) {
         let updatedKeyCount = 0;
         if (oldName && MetadataModel === PrimarySkillArea) {
@@ -219,7 +229,7 @@ export const deleteMetadataById = async (req, res) => {
           )).nModified;
         }
 
-        delRes.nSortKeysUpdated = updatedKeyCount;
+        if (updatedKeyCount > 0) delRes.nSortKeysUpdated = updatedKeyCount;
       }
 
       res.status(200).send(delRes);
@@ -266,8 +276,8 @@ export const updateMetadataById = async (req, res) => {
           )).nModified;
         }
 
-        updateRes.nSortKeysUpdated = updatedKeyCount;
-        res.status(201).send(updateRes);
+        if (updatedKeyCount > 0) updateRes.nSortKeysUpdated = updatedKeyCount;
+        res.status(200).send(updateRes);
       } else {
         res.status(200).send(updateRes);
       }
