@@ -3,7 +3,10 @@ import SecondarySkillArea from '../database/models/metadata/secondarySkillArea';
 import Institution from '../database/models/metadata/institution';
 import Program from '../database/models/metadata/program';
 import PdsaItem from '../database/models/pdsaItem';
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
+import {
+  cleanUpPrimarySkillAreaSortKeys,
+  cleanUpSecondarySkillAreaSortKeys
+} from './helpers/sortKeyHelper';
 
 /**
  * Return the matching Model from the provided itemName, if it doesn't match anything return null
@@ -179,15 +182,6 @@ export const findMetadataByParentId = async (req, res) => {
   }
 };
 
-const updatePrimarySkillAreaSortKey = async (primarySkillAreaId, itemId) => {
-  try {
-    const newSortKey = (await PrimarySkillArea.findById(primarySkillAreaId)).name;
-    await PdsaItem.update({ _id: itemId }, { primarySkillAreaSortKey: newSortKey });
-  } catch (e) {
-    throw new Error(e);
-  }
-};
-
 /**
  * Delete the Metadata Item specified in req.params.type with id = req.params.id
  *
@@ -233,43 +227,15 @@ export const deleteMetadataById = async (req, res) => {
             { primarySkillAreaSortKey: oldName },
             { primarySkillAreaSortKey: '' }
           )).nModified;
-          // and remove the id reference from the array
-          const numRefDeleted = (await PdsaItem.updateMany(
-            { primarySkillAreas: req.params.id },
-            {
-              $pullAll: {
-                primarySkillAreas: [req.params.id]
-              }
-            }
-          )).nModified;
 
-          // find all items that have no sort key but still contain elements in the skillArea array
-          const itemsThatNeedToBeUpdatedAgain = await PdsaItem.find({
-            primarySkillAreaSortKey: '',
-            $where: 'this.primarySkillAreas.length > 0'
-          });
-
-          for (let i = 0; i < itemsThatNeedToBeUpdatedAgain.length; i += 1) {
-            // const newSortKey = (await PrimarySkillArea.findById(
-            //   itemsThatNeedToBeUpdatedAgain[i].primarySkillAreas[0]
-            // )).name;
-            // await PdsaItem.update(
-            //   { _id: itemsThatNeedToBeUpdatedAgain[i]._id },
-            //   { primarySkillAreaSortKey: newSortKey }
-            // );
-            updatePrimarySkillAreaSortKey(
-              itemsThatNeedToBeUpdatedAgain[i].primarySkillAreas[0],
-              itemsThatNeedToBeUpdatedAgain[i]._id
-            );
-          }
-          console.log(
-            `Items to be updated again:  ${JSON.stringify(itemsThatNeedToBeUpdatedAgain)}`
-          );
+          cleanUpPrimarySkillAreaSortKeys(req.params.id);
         } else if (oldName && MetadataModel === SecondarySkillArea) {
           updatedKeyCount = (await PdsaItem.updateMany(
             { secondarySkillAreaSortKey: oldName },
             { secondarySkillAreaSortKey: '' }
           )).nModified;
+
+          cleanUpSecondarySkillAreaSortKeys(req.params.id);
         }
 
         if (updatedKeyCount > 0) delRes.nSortKeysUpdated = updatedKeyCount;
