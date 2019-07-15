@@ -2,15 +2,27 @@ import PrimarySkillArea from '../../database/models/metadata/primarySkillArea';
 import PdsaItem from '../../database/models/pdsaItem';
 import SecondarySkillArea from '../../database/models/metadata/secondarySkillArea';
 
-const updatePrimarySkillAreaSortKey = async (primarySkillAreaId, itemId) => {
+/**
+ * Given the primarySkillAreaId, find its name and update the sort key for the give pdsaItem.
+ *
+ * @param {ObjectId} primarySkillAreaId
+ * @param {ObjectId} pdsaItemId
+ */
+const updatePrimarySkillAreaSortKey = async (primarySkillAreaId, pdsaItemId) => {
   try {
     const newSortKey = (await PrimarySkillArea.findById(primarySkillAreaId)).name;
-    await PdsaItem.update({ _id: itemId }, { primarySkillAreaSortKey: newSortKey });
+    await PdsaItem.update({ _id: pdsaItemId }, { primarySkillAreaSortKey: newSortKey });
   } catch (e) {
     throw new Error(e);
   }
 };
 
+/**
+ * Given the secondarySkillAreaId, find its name and update the sort key for the give pdsaItem.
+ *
+ * @param {*} secondarySkillAreaId
+ * @param {*} itemId
+ */
 const updateSecondarySkillAreaSortKey = async (secondarySkillAreaId, itemId) => {
   try {
     const newSortKey = (await SecondarySkillArea.findById(secondarySkillAreaId)).name;
@@ -20,6 +32,10 @@ const updateSecondarySkillAreaSortKey = async (secondarySkillAreaId, itemId) => 
   }
 };
 
+/**
+ * Remove all references to the secondarySkillAreaId we are deleting, from the arrays in PDSAItems. Then update all PdsaItems that still have SecondarySkills but their SecondarySkillAreaSortKey is empty to use the first SecondarySkillArea they have.
+ * @param {ObjectId} secondarySkillAreaId
+ */
 export const cleanUpSecondarySkillAreaSortKeys = async secondarySkillAreaId => {
   // and remove the id reference from the array
   await PdsaItem.updateMany(
@@ -48,6 +64,10 @@ export const cleanUpSecondarySkillAreaSortKeys = async secondarySkillAreaId => {
   console.log(`Items to be updated again:  ${JSON.stringify(itemsThatNeedToBeUpdatedAgain)}`);
 };
 
+/**
+ * Remove all references to the primarySkillAreaId we are deleting, from the arrays in PDSAItems. Then update all PdsaItems that still have PrimarySkills but their PrimarySkillAreaSortKey is empty to use the first PrimarySkillArea they have.
+ * @param {ObjectId} secondarySkillAreaId
+ */
 export const cleanUpPrimarySkillAreaSortKeys = async primarySkillAreaId => {
   // and remove the id reference from the array
   await PdsaItem.updateMany(
