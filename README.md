@@ -255,7 +255,7 @@ No request body should be supplied.
 ###### Retrieving all Institutions
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/institutions'
+GET 'http://cm-pdsa-server/metadata/institutions'
 ```
 
 ```Javascript
@@ -280,7 +280,7 @@ RESPONSE:
 ###### Retrieving the 'University of Calgary' Institution by ID
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/institutions/5d28e2886778eb82b6ef13f1'
+GET 'http://cm-pdsa-server/metadata/institutions/5d28e2886778eb82b6ef13f1'
 ```
 
 ```Javascript
@@ -295,7 +295,7 @@ RESPONSE:
 ###### Retrieving the 'University of Calgary' Institution by name
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/institutions/name/University of Calgary'
+GET 'http://cm-pdsa-server/metadata/institutions/name/University of Calgary'
 ```
 
 ```Javascript
@@ -315,7 +315,7 @@ RESPONSE:
 ###### Retrieving all programs offered by the 'University of Calgary'
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/programs/parent-id/5d28e2886778eb82b6ef13f1'
+GET 'http://cm-pdsa-server/metadata/programs/parent-id/5d28e2886778eb82b6ef13f1'
 ```
 
 ```Javascript
@@ -360,7 +360,7 @@ RESPONSE:
 ###### Retrieving all SecondarySkillAreas under by the 'Learning and Development'
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d27b965360bcc6761543637'
+GET 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d27b965360bcc6761543637'
 ```
 
 ```Javascript
@@ -404,15 +404,15 @@ Use `PATCH` when updating some fields but not all. Use `PUT` when updating the e
 
 ##### Body
 
-The request body is a JSON object containting the fields you wish to update and their new values. Please see documentation for metadata models, for possible fields to update.
+The request body is a JSON object containing the fields you wish to update and their new values. Please see documentation for metadata models, for possible fields to update.
 
 ##### Response
 
-| Status                                | Code  | Response                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Updated successfully                  | `200` | Server responds an object containg number of objects matching the id: `n`, number of objects updated: `nModified`, if the request was completed succesfully: `ok` and the number of sort key updated on PDSA items: `nSortKeysUpdated` (used to sort PDSA items via skill areas, if no SortKeys were updated this field is not present) |
-| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                                                                                                                     |
-| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                                                                                                                                 |
+| Status                                | Code  | Response                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Updated successfully                  | `200` | Server responds an object containing number of objects matching the id: `n`, number of objects updated: `nModified`, if the request was completed successfully: `ok` and the number of sort key updated on PDSA items: `nSortKeysUpdated` (used to sort PDSA items via skill areas, if no SortKeys were updated this field is not present) |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                                                                                                                        |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                                                                                                                                    |
 
 ##### Examples
 
