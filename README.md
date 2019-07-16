@@ -511,7 +511,7 @@ To create a new `Other` supply an object like:
 
 ```JSON
 {
-    name: "New Conference",
+    name: "New Other",
     primarySkillAreas: [
         "5d1b7d4dcbb67eb5487bf12a",
         "5d16532b8f741ead3ee636d2"
@@ -952,12 +952,374 @@ RESPONSE:
 
 #### Create
 
+##### Description
+
+This route is used to create a new PDSA objects, specified by the type parameter in the URL. Types can be one of the following `books`, `certifications`, `conferences`, `course-seminars`, `subscriptions` or `other`.
+
+**Note:** you cannot create generic `pdsa-items` use one of the types instead.
+
+##### URL
+
+`HTTP POST http://cm-pdsa-server/metadata/:type`
+
+##### Parameters
+
+| Parameter | Possible values                                                                  |
+| --------- | -------------------------------------------------------------------------------- |
+| `:type`   | `books` `certifications` `conferences` `course-seminars` `subscriptions` `other` |
+
+##### Body
+
+The request body is the object you wish to create. Please see documentation for PdsaItem models.
+
+##### Response
+
+| Status               | Code  | Response                                                                |
+| -------------------- | ----- | ----------------------------------------------------------------------- |
+| Created successfully | `201` | Server responds with the object created.                                |
+| Invalid type         | `400` | Server responds with error message.                                     |
+| Server error         | `500` | Server responds with the error message throw while creating the object. |
+
+##### Examples
+
+###### Creating a new PDSA item of type Other
+
+```Javascript
+POST http://cm-pdsa-server/pdsa/other
+
+REQUEST.BODY:
+{
+    name: "A lesson in Restful APIs",
+    primarySkillAreas: [
+        "5d1b7d4dcbb67eb5487bf12a",
+        "5d16532b8f741ead3ee636d2"
+    ],
+    secondarySkillAreas: [
+        "5d1b85db03eda5c68e3b9718"
+    ],
+    url: "http://www.google.com",
+    startingPdsaTier: 1,
+    cost: {
+        currency: "CAD",
+        minCost: 1250,
+        maxCost: 1250,
+        groupPricingAvailable: false
+    },
+    institution: "x56jb85db03eda5c68e3b9718",
+    program: "j45gb78bd03cwo5c68e3b0127",
+    deliveryMethod: "online",
+    location: {
+        country: "Canada",
+        province: "Alberta",
+        city: "Calgary"
+    },
+    notableDates: {
+        start: "2019-01-01",
+        end: "2019-02-01",
+        otherDates: ["1999-12-31"]
+
+    },
+    ongoing: true,
+    visible: true
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "notableDates": {
+        "otherDates": [
+            "1999-12-31T00:00:00.000Z"
+        ],
+        "start": "2019-01-01T00:00:00.000Z",
+        "end": "2019-02-01T00:00:00.000Z"
+    },
+    "_id": "5d2df59d26c371b9ed33a055",
+    "primarySkillAreas": [
+        "5d2cdd272fa1b9a44cd3d9a5",
+        "5d2cebc6c240d7aa3edafded"
+    ],
+    "secondarySkillAreas": [
+        "5d2df51e26c371b9ed33a054"
+    ],
+    "previousAttendees": [],
+    "__t": "Other",
+    "name": "A lesson in Restful APIs",
+    "url": "http://www.google.com",
+    "startingPdsaTier": 1,
+    "cost": {
+        "currency": "CAD",
+        "minCost": 1250,
+        "maxCost": 1250,
+        "groupPricingAvailable": false
+    },
+    "institution": "5d28e2886778eb82b6ef13f1",
+    "program": "5d0bbce9a4e95add5f4f82e2",
+    "deliveryMethod": "online",
+    "location": {
+        "country": "Canada",
+        "province": "Alberta",
+        "city": "Calgary"
+    },
+    "ongoing": true,
+    "visible": true,
+    "primarySkillAreaSortKey": "Leadership and Development",
+    "secondarySkillAreaSortKey": "Leadership",
+    "reviews": [],
+    "__v": 0
+}
+```
+
 #### Read
 
 #### Update
 
+##### Description
+
+This route is used to update an existing pdsa item, specified by the type and id parameter in the URL. Types can be one of the following `books`, `certifications`, `conferences`, `course-seminars`, `subscriptions` or `other`, and id must be a valid `ObjectId` for the pdsa item being updated.
+
+**Note:** you _can_ also use `pdsa-items` as the generic type when updating.
+
+##### URLS
+
+`HTTP PATCH http://cm-pdsa-server/pdsa/:type/:id`
+`HTTP PUT http://cm-pdsa-server/pdsa/:type/:id`
+
+Use `PATCH` when updating some fields but not all. Use `PUT` when updating the entire object.
+
+##### Parameters
+
+| Parameter | Possible values                                                                               |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `:type`   | `books` `certifications` `conferences` `course-seminars` `subscriptions` `other` `pdsa-items` |
+| `:id`     | Valid `ObjectId` for the pdsa item to update                                                  |
+
+##### Body
+
+The request body is a JSON object containing the fields you wish to update and their new values. Please see documentation for pdsa models, for possible fields to update.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                             |
+| ------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updated successfully                  | `200` | Server responds an object containing number of objects matching the id: `n`, number of objects updated: `nModified`, if the request was completed successfully: `ok` |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                  |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                              |
+
+##### Examples
+
+###### Updating a PDSA item with type Other with a new name
+
+```Javascript
+PATCH 'http://cm-pdsa-server/pdsa/other/5d2df59d26c371b9ed33a055'
+or
+PATCH 'http://cm-pdsa-server/pdsa/pdsa-items/5d2df59d26c371b9ed33a055'
+
+
+REQUEST.BODY:
+{
+    name: "A lesson in AJAX"
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "nModified": 1,
+    "ok": 1
+}
+```
+
+###### Trying to update a PDSA Item without changing any values
+
+```Javascript
+PATCH 'http://cm-pdsa-server/pdsa/other/5d2df59d26c371b9ed33a055'
+
+
+REQUEST.BODY:
+{
+    name: "A lesson in AJAX"
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "nModified": 0,
+    "ok": 1
+}
+```
+
 #### Delete
+
+##### Description
+
+This route is used to delete an existing pdsa item, specified by the type and id parameter in the URL. Types can be one of the following `books`, `certifications`, `conferences`, `course-seminars`, `subscriptions` or `other`, and id must be a valid `ObjectId` for the pdsa item being updated.
+
+**Please Note:**
+
+- you _can_ also use `pdsa-items` as the generic type when deleting.
+- The object will be completely deleted and cannot be recovered.
+
+##### URLS
+
+`HTTP DELETE http://cm-pdsa-server/pdsa/:type/:id`
+
+##### Parameters
+
+| Parameter | Possible values                                                                               |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `:type`   | `books` `certifications` `conferences` `course-seminars` `subscriptions` `other` `pdsa-items` |
+| `:id`     | Valid `ObjectId` for the pdsa item to update                                                  |
+
+##### Body
+
+No request body should be supplied.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                        |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deleted successfully                  | `200` | Server responds with an object containing `n`: the number of objects matching the id, `ok`: if the query executed ok, `deletedCount`: how many items matching _id_ were deleted |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                             |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                         |
+
+##### Examples
+
+###### Deleting a PDSA Item
+
+```Javascript
+DELETE 'http://cm-pdsa-server/pdsa/other/5d2df59d26c371b9ed33a055'
+or
+DELETE 'http://cm-pdsa-server/pdsa/pdsa-items/5d2df59d26c371b9ed33a055'
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 1,
+    "ok": 1,
+    "deletedCount": 1
+}
+```
 
 #### Batch Delete
 
+##### Description
+
+This route is used to delete multiple existing pdsa item. Specified by a list of ids passed in the body.
+
+**Please Note:**
+
+- you _can_ also use `pdsa-items` as the generic type when deleting.
+- The objects will be completely deleted and cannot be recovered.
+
+##### URL
+
+`HTTP POST http://cm-pdsa-server/pdsa/:type/batch-delete`
+
+##### Parameters
+
+| Parameter | Possible values                                                                               |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `:type`   | `books` `certifications` `conferences` `course-seminars` `subscriptions` `other` `pdsa-items` |
+
+##### Body
+
+The request body is a JSON object containing a field 'ids' which is an array of ids for the objects you want to detele.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                        |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deleted successfully                  | `200` | Server responds with an object containing `n`: the number of objects matching the id, `ok`: if the query executed ok, `deletedCount`: how many items matching _id_ were deleted |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                             |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                         |
+
+##### Examples
+
+###### Deleting multiple PDSA Items
+
+```Javascript
+POST 'http://cm-pdsa-server/pdsa/pdsa-items/batch-delete'
+
+REQUEST.BODY:
+{
+    "ids": [
+        "5d2e06ff26c371b9ed33a056",
+        "5d2e070926c371b9ed33a057",
+        "5d2e078f26c371b9ed33a058",
+        "5d2e079f26c371b9ed33a059",
+        "5d2e07ae26c371b9ed33a05a"
+    ]
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 5,
+    "ok": 1,
+    "deletedCount": 5
+}
+```
+
 #### Batch Update
+
+##### Description
+
+This route is used to update multiple existing pdsa item. Specified by a list of ids passed in the body. Mainly intended to be used to switch the visible flag on multiple objects at once.
+
+**Please Note:**
+
+- you _can_ also use `pdsa-items` as the generic type when deleting.
+
+##### URL
+
+`HTTP POST http://cm-pdsa-server/pdsa/:type/batch-update`
+
+##### Parameters
+
+| Parameter | Possible values                                                                               |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `:type`   | `books` `certifications` `conferences` `course-seminars` `subscriptions` `other` `pdsa-items` |
+
+##### Body
+
+The request body is a JSON object containing a field 'ids' which is an array of ids for the objects you want to delete, and another field 'updates' which contains the updates you wish to perform for each object listed in ids.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                             |
+| ------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deleted successfully                  | `200` | Server responds an object containing number of objects matching the id: `n`, number of objects updated: `nModified`, if the request was completed successfully: `ok` |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                  |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                              |
+
+##### Examples
+
+###### Deleting multiple PDSA Items
+
+```Javascript
+POST 'http://cm-pdsa-server/pdsa/pdsa-items/batch-delete'
+
+REQUEST.BODY:
+{
+    "ids": [
+        "5d1cdba46b1773f69004c8c9",
+        "5d24ea012ffce00d3d1148e3"
+    ],
+    "updates" : { "visible": false }
+}
+```
+
+```Javascript
+RESPONSE:
+{
+    "n": 2,
+    "nModified": 2,
+    "ok": 1
+}
+```
