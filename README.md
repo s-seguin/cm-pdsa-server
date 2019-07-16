@@ -1072,6 +1072,914 @@ RESPONSE:
 
 #### Read
 
+##### Description
+
+These routes are used to query the database for PDSA Items. It allows for basic searching, filtering and sorting. You can also query all of the PDSA Items all at once, or drill down into the specific types by changing the type parameter.Types can be one of the following `books`, `certifications`, `conferences`, `course-seminars`, `subscriptions`, `other` or `pdsa-items`. You can specify a singular Pdsa Item to return via the id parameter; id must be a valid `ObjectId` for the pdsa item being updated. You can also paginate results using the `limit` and `page` options in your query. As well as sort on `name`, `primarySkillArea` and `secondarySkillArea` by supplying a comma separated list of field and order (e.g. sort=name:asc,primary:desc)
+
+##### URLS
+
+`HTTP GET http://cm-pdsa-server/pdsa/:type` => Returns all pdsa objects of specified type.
+
+`HTTP GET http://cm-pdsa-server/pdsa/:type/:id` => Returns the pdsa object matching specified type and id.
+
+`HTTP GET http://cm-pdsa-server/pdsa/:type?:query` => Returns all pdsa objects of specified type matching all parameters and values specified in the query.
+
+##### URL Parameters
+
+| Parameter | Possible values                                                                  |
+| --------- | -------------------------------------------------------------------------------- |
+| `:type`   | `books` `certifications` `conferences` `course-seminars` `subscriptions` `other` |
+
+##### Query Parameters
+
+Query Paramters go after the **?** and are separated with **&**. E.g. `http://cm-pdsa-server/pdsa/pdsa-items?primarySkillAreas=5d2cdd272fa1b9a44cd3d9a5,5d2cebc6c240d7aa3edafded&visible=true&startDate=2019-01-01&endDate=2020-01-01&sort=name:asc,primary:desc&limit=1&page=1`
+
+| Parameter               | Description                                                                                                                                                                        | Example                                                              |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `primarySkillAreas`     | A comma separated list of primarySkillArea ids.                                                                                                                                    | primarySkillAreas=5d2cdd272fa1b9a44cd3d9a5, 5d24ea012ffce00d3d1148e3 |
+| `secondarySkillAreas`   | A comma separated list of secondarySkillArea ids.                                                                                                                                  | secondarySkillAreas=5d2df51e26c371b9ed33a054                         |
+| `search`                | Searches (pseudo fuzzy) _name_, and the names of: _primarySkillAreas_ and _secondarySkillAreas_. **Note:** only searches the skill areas if you are not filtering by them as well. | search=Leadership and Development                                    |
+| `minCost`               | Filter by exact match on minCost                                                                                                                                                   | minCost=12.4                                                         |
+| `maxCost`               | Filter by exact match on maxCost                                                                                                                                                   | maxCost=113                                                          |
+| `currency`              | Filter by exact match on currency (case insensitive)                                                                                                                               | currency=CAD                                                         |
+| `groupPricingAvailable` | Filter whether `true` or `false`                                                                                                                                                   | groupPricingAvailable=true                                           |
+| `country`               | Filters exact match to country                                                                                                                                                     | country=Canada                                                       |
+| `province`              | Filters exact match to province                                                                                                                                                    | country=Alberta                                                      |
+| `city`                  | Filters exact match to calgary                                                                                                                                                     | city=Calgary                                                         |
+| `deliveryMethod`        | Filters exact match on deliveryMethod.                                                                                                                                             | deliveryMethod=in-class                                              |
+| `startingPdsaTier`      | Filters exact match on startingPdsaTier                                                                                                                                            | startingPdsaTier=3                                                   |
+| `visible`               | Filters on visible or invisible                                                                                                                                                    | visible=true                                                         |
+| `institution`           | Filters on exact match to one ObjectId reference to institution                                                                                                                    | institution=5d28e2886778eb82b6ef13f1                                 |
+| `program`               | Filters on exact match to one ObjectId reference to program                                                                                                                        | program=5d0bbce9a4e95add5f4f82e2                                     |
+| `startDate`, `endDate`  | Filter to all dates inbetween startDate and endDate                                                                                                                                | startDate=2019-01-01&endDate=2020-01-01                              |
+| `limit`, `page`         | Used for pagination. Limit to a certain number of entries per page and specify page you want.                                                                                      | limit=1&page=2                                                       |
+| `sort`                  | Used for sorting data by either name, primary or secondary skills in either ascending (`asc`) or descending (`desc`) order.                                                        | sort=name:desc,primary:desc                                          |
+
+##### Body
+
+No request body should be supplied.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                                                                              |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updated successfully                  | `200` | Server responds with the object requested when specified by `id`. Otherwise an object containing `docs` which is an array of all objects (Mongo documents) matching the request and `totalDocs` which is the count of docs in `docs`. |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                   |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                               |
+
+##### Body
+
+No request body should be supplied.
+
+##### Response
+
+| Status                                | Code  | Response                                                                                                                                                                                                                              |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updated successfully                  | `200` | Server responds with the object requested when specified by `id`. Otherwise an object containing `docs` which is an array of all objects (Mongo documents) matching the request and `totalDocs` which is the count of docs in `docs`. |
+| Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                   |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                               |
+
+##### Examples
+
+###### Get all PDSA Items in database
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/pdsa-items'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "location": {
+                "country": "Canada",
+                "province": "Alberta",
+                "city": "Calgary"
+            },
+            "notableDates": {
+                "otherDates": [
+                    "1999-12-31T00:00:00.000Z"
+                ],
+                "start": "2019-01-01T00:00:00.000Z",
+                "end": "2019-02-01T00:00:00.000Z"
+            },
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Other",
+            "reviews": [],
+            "_id": "5d2e34af26c371b9ed33a05c",
+            "name": "Numero 4",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "program": {
+                "_id": "5d0bbce9a4e95add5f4f82e2",
+                "name": "Computer Science",
+                "institution": "5d28e2886778eb82b6ef13f1",
+                "__v": 0
+            },
+            "deliveryMethod": "online",
+            "ongoing": true,
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "reviews": [],
+            "_id": "5d2e34da26c371b9ed33a05d",
+            "name": "The Story of  Book",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "reviews": [],
+            "_id": "5d2e34e726c371b9ed33a05e",
+            "name": "The Story of a Book 2",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "reviews": [],
+            "_id": "5d2e34fd26c371b9ed33a05f",
+            "name": "Story of a Book 3",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 12.5,
+                "maxCost": 12.5,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 4
+}
+```
+
+###### Get all PDSA Items specific item by id
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/pdsa-items/5d2e34fd26c371b9ed33a05f'
+```
+
+```Javascript
+RESPONSE:
+{
+    "primarySkillAreas": [
+        "5d2cdd272fa1b9a44cd3d9a5",
+        "5d2cebc6c240d7aa3edafded"
+    ],
+    "secondarySkillAreas": [
+        "5d2df51e26c371b9ed33a054"
+    ],
+    "previousAttendees": [],
+    "__t": "Book",
+    "reviews": [],
+    "_id": "5d2e34fd26c371b9ed33a05f",
+    "name": "Story of a Book 3",
+    "url": "http://www.google.com",
+    "startingPdsaTier": 1,
+    "cost": {
+        "currency": "CAD",
+        "minCost": 12.5,
+        "maxCost": 12.5,
+        "groupPricingAvailable": false
+    },
+    "author": "John Doe",
+    "publisher": "Penguin House",
+    "visible": true,
+    "primarySkillAreaSortKey": "Seals March Together",
+    "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+    "__v": 0
+}
+```
+
+###### Get all PDSA Items of type book
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/books'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "_id": "5d2e34da26c371b9ed33a05d",
+            "name": "The Story of  Book",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "reviews": [],
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "_id": "5d2e34e726c371b9ed33a05e",
+            "name": "The Story of a Book 2",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "reviews": [],
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "_id": "5d2e34fd26c371b9ed33a05f",
+            "name": "Story of a Book 3",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 12.5,
+                "maxCost": 12.5,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "reviews": [],
+            "__v": 0
+        }
+    ],
+    "totalDocs": 3
+}
+```
+
+###### Search PDSA items for name or skill names matching 'Numero'
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/pdsa-items?search=Numero'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "location": {
+                "country": "Canada",
+                "province": "Alberta",
+                "city": "Calgary"
+            },
+            "notableDates": {
+                "otherDates": [
+                    "1999-12-31T00:00:00.000Z"
+                ],
+                "start": "2019-01-01T00:00:00.000Z",
+                "end": "2019-02-01T00:00:00.000Z"
+            },
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Other",
+            "reviews": [],
+            "_id": "5d2e34af26c371b9ed33a05c",
+            "name": "Numero 4",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "program": {
+                "_id": "5d0bbce9a4e95add5f4f82e2",
+                "name": "Computer Science",
+                "institution": "5d28e2886778eb82b6ef13f1",
+                "__v": 0
+            },
+            "deliveryMethod": "online",
+            "ongoing": true,
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 1
+}
+```
+
+###### Search PDSA items for name or skill names matching 'UnusedString'
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/pdsa-items?search=UnusedString'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [],
+    "totalDocs": 0
+}
+```
+
+###### Combining filters in query
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/pdsa-items?primarySkillAreas=5d2cdd272fa1b9a44cd3d9a5,5d2cebc6c240d7aa3edafded&visible=true&startDate=2019-01-01&endDate=2020-01-01'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "location": {
+                "country": "Canada",
+                "province": "Alberta",
+                "city": "Calgary"
+            },
+            "notableDates": {
+                "otherDates": [
+                    "1999-12-31T00:00:00.000Z"
+                ],
+                "start": "2019-01-01T00:00:00.000Z",
+                "end": "2019-02-01T00:00:00.000Z"
+            },
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Other",
+            "reviews": [],
+            "_id": "5d2e34af26c371b9ed33a05c",
+            "name": "Numero 4",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "program": {
+                "_id": "5d0bbce9a4e95add5f4f82e2",
+                "name": "Computer Science",
+                "institution": "5d28e2886778eb82b6ef13f1",
+                "__v": 0
+            },
+            "deliveryMethod": "online",
+            "ongoing": true,
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 1
+}
+```
+
+###### Get all PDSA items sorting on name in ascending order
+
+```Javascript
+GET 'http://cm-pdsa-server/pdsa/pdsa-items?sort=name:asc'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "location": {
+                "country": "Canada",
+                "province": "Alberta",
+                "city": "Calgary"
+            },
+            "notableDates": {
+                "otherDates": [
+                    "1999-12-31T00:00:00.000Z"
+                ],
+                "start": "2019-01-01T00:00:00.000Z",
+                "end": "2019-02-01T00:00:00.000Z"
+            },
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Other",
+            "reviews": [],
+            "_id": "5d2e34af26c371b9ed33a05c",
+            "name": "Numero 4",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "program": {
+                "_id": "5d0bbce9a4e95add5f4f82e2",
+                "name": "Computer Science",
+                "institution": "5d28e2886778eb82b6ef13f1",
+                "__v": 0
+            },
+            "deliveryMethod": "online",
+            "ongoing": true,
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "reviews": [],
+            "_id": "5d2e34fd26c371b9ed33a05f",
+            "name": "Story of a Book 3",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 12.5,
+                "maxCost": 12.5,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "reviews": [],
+            "_id": "5d2e34da26c371b9ed33a05d",
+            "name": "The Story of  Book",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        },
+        {
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Book",
+            "reviews": [],
+            "_id": "5d2e34e726c371b9ed33a05e",
+            "name": "The Story of a Book 2",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "author": "John Doe",
+            "publisher": "Penguin House",
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 4
+}
+```
+
+###### Get all PDSA items sorting on name in ascending order and paginating 1 item per page
+
+```Javascript
+GET 'http://localhost:3000/pdsa/pdsa-items?sort=name:asc&limit=1&page=1'
+```
+
+```Javascript
+RESPONSE:
+{
+    "docs": [
+        {
+            "location": {
+                "country": "Canada",
+                "province": "Alberta",
+                "city": "Calgary"
+            },
+            "notableDates": {
+                "otherDates": [
+                    "1999-12-31T00:00:00.000Z"
+                ],
+                "start": "2019-01-01T00:00:00.000Z",
+                "end": "2019-02-01T00:00:00.000Z"
+            },
+            "primarySkillAreas": [
+                {
+                    "_id": "5d2cdd272fa1b9a44cd3d9a5",
+                    "name": "Seals March Together",
+                    "__v": 0
+                },
+                {
+                    "_id": "5d2cebc6c240d7aa3edafded",
+                    "name": "Cows Against Seals",
+                    "__v": 0
+                }
+            ],
+            "secondarySkillAreas": [
+                {
+                    "_id": "5d2df51e26c371b9ed33a054",
+                    "name": "Ka Ka PIIIIIIGD",
+                    "parentPrimarySkillArea": "5d2cdd272fa1b9a44cd3d9a5",
+                    "__v": 0
+                }
+            ],
+            "previousAttendees": [],
+            "__t": "Other",
+            "reviews": [],
+            "_id": "5d2e34af26c371b9ed33a05c",
+            "name": "Numero 4",
+            "url": "http://www.google.com",
+            "startingPdsaTier": 1,
+            "cost": {
+                "currency": "CAD",
+                "minCost": 1250,
+                "maxCost": 1250,
+                "groupPricingAvailable": false
+            },
+            "institution": {
+                "_id": "5d28e2886778eb82b6ef13f1",
+                "name": "University of Calgary",
+                "__v": 0
+            },
+            "program": {
+                "_id": "5d0bbce9a4e95add5f4f82e2",
+                "name": "Computer Science",
+                "institution": "5d28e2886778eb82b6ef13f1",
+                "__v": 0
+            },
+            "deliveryMethod": "online",
+            "ongoing": true,
+            "visible": true,
+            "primarySkillAreaSortKey": "Seals March Together",
+            "secondarySkillAreaSortKey": "Ka Ka PIIIIIIGD",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 4,
+    "limit": 1,
+    "hasPrevPage": false,
+    "hasNextPage": true,
+    "page": 1,
+    "totalPages": 4,
+    "pagingCounter": 1,
+    "prevPage": null,
+    "nextPage": 2
+}
+```
+
 #### Update
 
 ##### Description
