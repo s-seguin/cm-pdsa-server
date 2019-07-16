@@ -6,7 +6,7 @@ import PdsaItem from '../database/models/pdsaItem';
 import {
   cleanUpPrimarySkillAreaSortKeys,
   cleanUpSecondarySkillAreaSortKeys
-} from './helpers/sortKeyHelper';
+} from './helpers/sortKeyCleanUpHelper';
 
 /**
  * Return the matching Model from the provided itemName, if it doesn't match anything return null
