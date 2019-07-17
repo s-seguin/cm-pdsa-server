@@ -48,7 +48,9 @@ export const createSortForMongooseQuery = urlQuery => {
   // check if they passed in sort params
   if (!undefinedNullOrEmpty(urlQuery.sort)) {
     const sortItems = urlQuery.sort.split(',');
-    const mongooseSort = {};
+    // see line 63 where we are modifying mongooseSort
+    // eslint-disable-next-line prefer-const
+    let mongooseSort = {};
     for (let i = 0; i < sortItems.length; i += 1) {
       const params = sortItems[i].split(':');
       // ensure the passed in a key and an order
