@@ -64,15 +64,15 @@ To create a new `PrimarySkillArea` supply an object like:
 
 #### SecondarySkillArea
 
-This model is used to store the different Secondary Skill Areas. Each Secondary Skill belongs to a `PrimarySkillArea` and has a reference to its parent.
+This model is used to store the different Secondary Skill Areas. Each Secondary Skill can have references to multiple `PrimarySkillArea` but they are not required.
 
 ##### Fields
 
-| Name                   | Description                                                                          | Type       | Required             |
-| ---------------------- | ------------------------------------------------------------------------------------ | ---------- | -------------------- |
-| name                   | The name of the SecondarySkillArea                                                   | `String`   | `true`               |
-| parentPrimarySkillArea | An ObjectId that references the PrimarySkillArea this SecondarySkillArea belongs to. | `ObjectId` | `true`               |
-| _\_id_                 | Auto generated ObjectId                                                              | `ObjectId` | _Created by MongoDb_ |
+| Name                       | Description                                                                                         | Type         | Required             |
+| -------------------------- | --------------------------------------------------------------------------------------------------- | ------------ | -------------------- |
+| name                       | The name of the SecondarySkillArea                                                                  | `String`     | `true`               |
+| primarySkillAreaReferences | An array of ObjectIds that references the PrimarySkillArea this SecondarySkillArea associates with. | [`ObjectId`] | `false`              |
+| _\_id_                     | Auto generated ObjectId                                                                             | `ObjectId`   | _Created by MongoDb_ |
 
 ##### Example
 
@@ -80,8 +80,8 @@ To create a new `SecondarySkillArea` supply an object like:
 
 ```JSON
 {
-    name: "Teamwork",
-    parentPrimarySkillArea: "5d1cdba46b1773f69004c8c9"
+    primarySkillAreaReferences: ["5d2f90067c30290af1f0fe63"],
+    name: "Teamwork"
 }
 ```
 
