@@ -3,45 +3,13 @@ import PdsaItem from '../../database/models/pdsaItem';
 import SecondarySkillArea from '../../database/models/metadata/secondarySkillArea';
 
 /**
- * Given the primarySkillAreaId, find its name and update the sort key for the give pdsaItem.
- *
- * @param {ObjectId} primarySkillAreaId
- * @param {ObjectId} pdsaItemId
- */
-const updatePrimarySkillAreaSortKey = async (primarySkillAreaId, pdsaItemId) => {
-  try {
-    const newSortKey = (await PrimarySkillArea.findById(primarySkillAreaId)).name;
-    await PdsaItem.update({ _id: pdsaItemId }, { primarySkillAreaSortKey: newSortKey });
-  } catch (e) {
-    throw new Error(e);
-  }
-};
-
-/**
- * Given the secondarySkillAreaId, find its name and update the sort key for the give pdsaItem.
- *
- * @param {*} secondarySkillAreaId
- * @param {*} itemId
- */
-const updateSecondarySkillAreaSortKey = async (secondarySkillAreaId, itemId) => {
-  try {
-    const newSortKey = (await SecondarySkillArea.findById(secondarySkillAreaId)).name;
-    await PdsaItem.update({ _id: itemId }, { secondarySkillAreaSortKey: newSortKey });
-  } catch (e) {
-    throw new Error(e);
-  }
-};
-
-/**
  * Remove all references to the secondarySkillAreaId we are deleting, from the arrays in PDSAItems. Then update all PdsaItems that still have SecondarySkills but their SecondarySkillAreaSortKey is empty to use the first SecondarySkillArea they have.
  * @param {ObjectId} secondarySkillAreaId
  */
 export const cleanUpSecondarySkillAreaSortKeys = async secondarySkillAreaId => {
   // and remove the id reference from the array
   await PdsaItem.updateMany(
-    {
-      secondarySkillAreas: secondarySkillAreaId
-    },
+    { secondarySkillAreas: secondarySkillAreaId },
     {
       $pullAll: {
         secondarySkillAreas: [secondarySkillAreaId]
@@ -55,13 +23,15 @@ export const cleanUpSecondarySkillAreaSortKeys = async secondarySkillAreaId => {
     $where: 'this.secondarySkillAreas.length > 0'
   });
 
-  for (let i = 0; i < itemsThatNeedToBeUpdatedAgain.length; i += 1) {
-    updateSecondarySkillAreaSortKey(
-      itemsThatNeedToBeUpdatedAgain[i].secondarySkillAreas[0],
-      itemsThatNeedToBeUpdatedAgain[i]._id
-    );
-  }
-  console.log(`Items to be updated again:  ${JSON.stringify(itemsThatNeedToBeUpdatedAgain)}`);
+  // for each item we found that needs to be updated, update its sort key to the next in the skill array
+  itemsThatNeedToBeUpdatedAgain.forEach(async pdsaItem => {
+    try {
+      const newSortKey = (await SecondarySkillArea.findById(pdsaItem.secondarySkillAreas[0])).name;
+      await PdsaItem.update({ _id: pdsaItem._id }, { secondarySkillAreaSortKey: newSortKey });
+    } catch (e) {
+      throw new Error(e);
+    }
+  });
 };
 
 /**
@@ -71,9 +41,7 @@ export const cleanUpSecondarySkillAreaSortKeys = async secondarySkillAreaId => {
 export const cleanUpPrimarySkillAreaSortKeys = async primarySkillAreaId => {
   // and remove the id reference from the array
   await PdsaItem.updateMany(
-    {
-      primarySkillAreas: primarySkillAreaId
-    },
+    { primarySkillAreas: primarySkillAreaId },
     {
       $pullAll: {
         primarySkillAreas: [primarySkillAreaId]
@@ -87,11 +55,13 @@ export const cleanUpPrimarySkillAreaSortKeys = async primarySkillAreaId => {
     $where: 'this.primarySkillAreas.length > 0'
   });
 
-  for (let i = 0; i < itemsThatNeedToBeUpdatedAgain.length; i += 1) {
-    updatePrimarySkillAreaSortKey(
-      itemsThatNeedToBeUpdatedAgain[i].primarySkillAreas[0],
-      itemsThatNeedToBeUpdatedAgain[i]._id
-    );
-  }
-  console.log(`Items to be updated again:  ${JSON.stringify(itemsThatNeedToBeUpdatedAgain)}`);
+  // for each item we found that needs to be updated, update its sort key to the next in the skill array
+  itemsThatNeedToBeUpdatedAgain.forEach(async pdsaItem => {
+    try {
+      const newSortKey = (await PrimarySkillArea.findById(pdsaItem.primarySkillAreas[0])).name;
+      await PdsaItem.update({ _id: pdsaItem._id }, { primarySkillAreaSortKey: newSortKey });
+    } catch (e) {
+      throw new Error(e);
+    }
+  });
 };

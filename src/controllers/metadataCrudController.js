@@ -218,7 +218,6 @@ export const deleteMetadataById = async (req, res) => {
         delRes.nChildrenDeleted = childrenDeleted;
 
       // if we successfully delete a skill area update the sort key references that used it to be empty or if the item has another skill area, the next one
-      // TODO: check if the item we are deleting has other skill areas we can updated the sort key too
       if (delRes.deletedCount > 0) {
         let updatedKeyCount = 0;
         if (oldName && MetadataModel === PrimarySkillArea) {
@@ -228,14 +227,16 @@ export const deleteMetadataById = async (req, res) => {
             { primarySkillAreaSortKey: '' }
           )).nModified;
 
-          cleanUpPrimarySkillAreaSortKeys(req.params.id);
+          // Go through and make sure that we update all the sort keys to have values if there are other skill areas remaining
+          await cleanUpPrimarySkillAreaSortKeys(req.params.id);
         } else if (oldName && MetadataModel === SecondarySkillArea) {
           updatedKeyCount = (await PdsaItem.updateMany(
             { secondarySkillAreaSortKey: oldName },
             { secondarySkillAreaSortKey: '' }
           )).nModified;
 
-          cleanUpSecondarySkillAreaSortKeys(req.params.id);
+          // Go through and make sure that we update all the sort keys to have values if there are other skill areas remaining
+          await cleanUpSecondarySkillAreaSortKeys(req.params.id);
         }
 
         if (updatedKeyCount > 0) delRes.nSortKeysUpdated = updatedKeyCount;
