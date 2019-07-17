@@ -55,6 +55,8 @@ const pdsaItemSchema = mongoose.Schema({
     required: true,
     validate: arrayValidator
   },
+  primarySkillAreaSortKey: String,
+  secondarySkillAreaSortKey: String,
   url: { type: String, trim: true, required: true },
   startingPdsaTier: { type: Number, required: true, validate: pdsaTierValidator },
   cost: {

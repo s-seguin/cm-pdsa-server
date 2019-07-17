@@ -3,6 +3,7 @@ import {
   getIdsOfSecondarySkillsMatchingSearch,
   getIdsOfPrimarySkillsMatchingSearch
 } from './searchHelper';
+
 /**
  * Checks if an object is null, undefined or whitespace.
  * @param {Object} obj
@@ -10,6 +11,69 @@ import {
 export const undefinedNullOrEmpty = obj => {
   if (obj === null || obj === undefined || obj.trim() === '') return true;
   return false;
+};
+
+/**
+ * From the parameter check if its a valid sort key, and transpose it to the corresponding sort key in the model. Else return null.
+ * @param {String} itemName
+ */
+const getSortKey = itemName =>
+  ({
+    name: 'name',
+    primary: 'primarySkillAreaSortKey',
+    secondary: 'secondarySkillAreaSortKey'
+  }[itemName] || null);
+
+/**
+ * From the parameter check if its a valid sort order, and transpose it to the corresponding sort order in mongoose. Else return null.
+ * @param {String} itemName
+ */
+const getSortOrder = itemName =>
+  ({
+    asc: 1,
+    desc: -1,
+    '1': 1,
+    '-1': -1
+  }[itemName] || null);
+
+/**
+ * Reduce the sort query (after being split on ',') to a single object we can pass into Mongoose to sort.
+ * @param {Object} acc The accumulated object we are building
+ * @param {String} cur The current string which is a single sort query that we need to split and store as an object
+ */
+const createSortObject = (acc, cur) => {
+  const params = cur.split(':');
+  // ensure the passed in a key and an order
+  // ensure they are valid
+  if (params.length === 2) {
+    const sortKey = getSortKey(params[0]);
+    const sortOrder = getSortOrder(params[1]);
+
+    // return the sort object
+    if (sortKey && sortOrder) acc[sortKey] = sortOrder;
+  }
+  return acc;
+};
+
+/**
+ * From the request.query object return they sort options
+ *
+ * Valid sort keys are: name, primary, secondary
+ * Valid sort orders: 'asc', 'desc', 1, -1
+ *
+ * @param {Request.query} urlQuery
+ */
+export const createSortForMongooseQuery = urlQuery => {
+  // check if they passed in sort params
+  if (!undefinedNullOrEmpty(urlQuery.sort)) {
+    const sortItems = urlQuery.sort.split(',');
+
+    // Build an object with all the sort parameters, pass in an initial empty object to reduce the entire array
+    const mongooseSort = sortItems.reduce(createSortObject, {});
+
+    return Object.entries(mongooseSort).length > 0 ? mongooseSort : null;
+  }
+  return null;
 };
 
 /**
