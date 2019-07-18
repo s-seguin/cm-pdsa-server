@@ -631,7 +631,7 @@ POST http://cm-pdsa-server/metadata/secondary-skills
 REQUEST.BODY:
 {
     name: "Teamwork",
-    parentPrimarySkillArea: "5d27b965360bcc6761543637"
+    primarySkillAreaReferences: ["5d27b965360bcc6761543637"]
 }
 ```
 
@@ -640,7 +640,7 @@ RESPONSE:
 {
     "_id": "5d27b993360bcc6761543638",
     "name": "Teamwork",
-    "parentPrimarySkillArea": "5d27b965360bcc6761543637",
+    "primarySkillAreaReferences": ["5d27b965360bcc6761543637"],
     "__v": 0
 }
 ```
@@ -792,21 +792,23 @@ RESPONSE:
 ###### Retrieving all SecondarySkillAreas under by the 'Learning and Development'
 
 ```Javascript
-GET 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d27b965360bcc6761543637'
+GET 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d30a1a7018fdd1d70dee024'
 ```
 
 ```Javascript
 RESPONSE:
 {
     "docs": [
-        {
-            "_id": "5d28e5b66778eb82b6ef13f4",
-            "name": "Teamwork",
-            "parentPrimarySkillArea": {
-                "_id": "5d27b965360bcc6761543637",
-                "name": "Learning and Development",
-                "__v": 0
-            },
+         {
+            "primarySkillAreaReferences": [
+                {
+                    "_id": "5d30a1a7018fdd1d70dee024",
+                    "name": "Learning and Development",
+                    "__v": 0
+                }
+            ],
+            "_id": "5d30cfd9a4841731c45f8250",
+            "name": "Python",
             "__v": 0
         }
     ],
