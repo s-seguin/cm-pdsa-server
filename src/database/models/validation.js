@@ -20,6 +20,13 @@ const noDuplicateValues = arr => {
   return true;
 };
 
+export const primarySkillAreaReferenceValidator = [
+  {
+    validator: noDuplicateValues,
+    msg: 'The supplied array of PrimarySkillArea References cannot contain duplicate entries.'
+  }
+];
+
 // The validator for skill areas arrays
 export const arrayValidator = [
   { validator: notEmptyArrayValidator, msg: 'The supplied arrays of Skill Areas cannot be empty.' },
