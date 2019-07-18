@@ -952,7 +952,7 @@ No request body should be supplied.
 ###### Deleting the 'Learning and Growth' PrimarySkillArea
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/primary-skills/5d27b965360bcc6761543637'
+DELETE 'http://cm-pdsa-server/pdsa/primary-skills/5d27b965360bcc6761543637'
 ```
 
 ```Javascript
