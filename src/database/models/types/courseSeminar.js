@@ -21,7 +21,7 @@ import { deliveryMethodValidator } from '../validation';
 
 const CourseSeminar = PdsaItem.discriminator(
   'CourseSeminar',
-  mongoose.Schema({
+  new mongoose.Schema({
     institution: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Institution',

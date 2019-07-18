@@ -19,7 +19,7 @@ import { deliveryMethodValidator } from '../validation';
 
 const Conference = PdsaItem.discriminator(
   'Conference',
-  mongoose.Schema({
+  new mongoose.Schema({
     institution: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Institution',
