@@ -49,6 +49,15 @@ export const cleanUpPrimarySkillAreaSortKeys = async primarySkillAreaId => {
     }
   );
 
+  await SecondarySkillArea.updateMany(
+    { primarySkillAreaReferences: primarySkillAreaId },
+    {
+      $pullAll: {
+        primarySkillAreaReferences: [primarySkillAreaId]
+      }
+    }
+  );
+
   // find all items that have no sort key but still contain elements in the skillArea array
   const itemsThatNeedToBeUpdatedAgain = await PdsaItem.find({
     primarySkillAreaSortKey: '',

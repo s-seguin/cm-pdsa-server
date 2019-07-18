@@ -57,13 +57,8 @@ export const findMetadata = async (req, res) => {
   if (MetadataModel !== null) {
     try {
       const results = await MetadataModel.find()
-        .populate('parentPrimarySkillArea')
-        .populate({
-          path: 'secondarySkillArea',
-          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-        })
+        .populate('primarySkillAreaReferences')
         .populate('institution')
-        .populate('program')
         .exec();
       const retObj = {
         docs: results,
@@ -90,13 +85,8 @@ export const findMetadataById = async (req, res) => {
   if (MetadataModel !== null) {
     try {
       const results = await MetadataModel.findById(req.params.id)
-        .populate('parentPrimarySkillArea')
-        .populate({
-          path: 'secondarySkillArea',
-          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-        })
+        .populate('primarySkillAreaReferences')
         .populate('institution')
-        .populate('program')
         .exec();
 
       res.status(200).send(results);
@@ -120,13 +110,8 @@ export const findMetadataByName = async (req, res) => {
   if (MetadataModel !== null) {
     try {
       const results = await MetadataModel.find({ name: req.params.name })
-        .populate('parentPrimarySkillArea')
-        .populate({
-          path: 'secondarySkillArea',
-          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-        })
+        .populate('primarySkillAreaReferences')
         .populate('institution')
-        .populate('program')
         .exec();
       const retObj = {
         docs: results,
@@ -158,16 +143,11 @@ export const findMetadataByParentId = async (req, res) => {
       const searchParam =
         MetadataModel === Program
           ? { institution: req.params.parentId }
-          : { parentPrimarySkillArea: req.params.parentId };
+          : { primarySkillAreaReferences: { $in: req.params.parentId } };
 
       const results = await MetadataModel.find(searchParam)
-        .populate('parentPrimarySkillArea')
-        .populate({
-          path: 'secondarySkillArea',
-          populate: { path: 'parentPrimarySkillArea', model: 'PrimarySkillArea' }
-        })
+        .populate('primarySkillAreaReferences')
         .populate('institution')
-        .populate('program')
         .exec();
       const retObj = {
         docs: results,

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { primarySkillAreaReferenceValidator } from '../validation';
 
 /**
  * A schema to hold the Secondary Skill Areas that PDSA items an be a part of e.g. Leadership and Development, Human Resources
@@ -7,10 +8,15 @@ import mongoose from 'mongoose';
  */
 const secondarySkillAreaSchema = mongoose.Schema({
   name: { type: String, required: true, trim: true },
-  parentPrimarySkillArea: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'PrimarySkillArea',
-    required: true
+  primarySkillAreaReferences: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PrimarySkillArea',
+        required: true
+      }
+    ],
+    validate: primarySkillAreaReferenceValidator
   }
 });
 
