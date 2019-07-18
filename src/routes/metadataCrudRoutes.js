@@ -8,7 +8,7 @@ import {
   findMetadataByName,
   findMetadataByParentId
 } from '../controllers/metadataCrudController';
-import locationController from '../controllers/locationController';
+import PdsaItem from '../database/models/pdsaItem';
 
 const router = express.Router();
 
@@ -21,10 +21,9 @@ const router = express.Router();
  * This route provides an array of all the location strings in the database
  */
 router.get('/locations', async (req, res) => {
-
   const results = (await PdsaItem.find().select('location')).map(x => x.location);
   res.send(results);
-);
+});
 
 // ////// //
 // CREATE //
