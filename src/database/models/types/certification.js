@@ -14,22 +14,19 @@ import { deliveryMethodValidator } from '../validation';
  *
  * ongoing: Is the certification ongoing?
  */
-const Certification = PdsaItem.discriminator(
-  'Certification',
-  new mongoose.Schema({
-    institution: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Institution',
-      required: false
-    },
-    deliveryMethod: { type: String, validate: deliveryMethodValidator }, // 'Online', 'InClass', 'Both'
-    location: {
-      country: String,
-      province: String,
-      city: String
-    },
-    ongoing: Boolean
-  })
-);
+const certificationSchema = mongoose.Schema({
+  institution: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Institution',
+    required: false
+  },
+  deliveryMethod: { type: String, validate: deliveryMethodValidator }, // 'Online', 'InClass', 'Both'
+  location: String,
+  ongoing: Boolean
+});
+
+certificationSchema.index({ location: 'text' });
+
+const Certification = PdsaItem.discriminator('Certification', certificationSchema);
 
 export default Certification;

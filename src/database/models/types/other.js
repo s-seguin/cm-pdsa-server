@@ -22,29 +22,26 @@ import { deliveryMethodValidator } from '../validation';
  *
  * ongoing: Is this ongoing?
  */
-const Other = PdsaItem.discriminator(
-  'Other',
-  new mongoose.Schema({
-    institution: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Institution',
-      required: false
-    },
-    program: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Program',
-      required: false
-    },
-    deliveryMethod: { type: String, validate: deliveryMethodValidator },
-    location: {
-      country: String,
-      province: String,
-      city: String
-    },
-    duration: String,
-    notableDates: { start: Date, end: Date, otherDates: [Date] },
-    ongoing: Boolean
-  })
-);
+const otherSchema = mongoose.Schema({
+  institution: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Institution',
+    required: false
+  },
+  program: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Program',
+    required: false
+  },
+  deliveryMethod: { type: String, validate: deliveryMethodValidator },
+  location: String,
+  duration: String,
+  notableDates: { start: Date, end: Date, otherDates: [Date] },
+  ongoing: Boolean
+});
+
+otherSchema.index({ location: 'text' });
+
+const Other = PdsaItem.discriminator('Other', otherSchema);
 
 export default Other;
