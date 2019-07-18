@@ -182,9 +182,6 @@ export const createFilterForMongooseQuery = async urlQuery => {
     };
   }
 
-  console.log(`Mongoose Query: ${JSON.stringify(mongooseQuery)}`);
-  console.log(`Mongoose Search Query: ${JSON.stringify(mongooseSearchQuery)}`);
-
   // if we are searching and filtering, the query to return is searchQuery AND mongooseQuery
   if (searching && Object.entries(mongooseQuery).length > 0) {
     return { $and: [mongooseQuery, mongooseSearchQuery] };

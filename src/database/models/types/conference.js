@@ -16,20 +16,20 @@ import { deliveryMethodValidator } from '../validation';
  *
  * ongoing: Is the conference ongoing?
  */
-const conferenceSchema = mongoose.Schema({
-  institution: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Institution',
-    required: false
-  },
-  deliveryMethod: { type: String, validate: deliveryMethodValidator },
-  location: String,
-  notableDates: { start: Date, end: Date, otherDates: [Date] },
-  ongoing: Boolean
-});
 
-conferenceSchema.index({ location: 'text' });
-
-const Conference = PdsaItem.discriminator('Conference', conferenceSchema);
+const Conference = PdsaItem.discriminator(
+  'Conference',
+  mongoose.Schema({
+    institution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Institution',
+      required: false
+    },
+    deliveryMethod: { type: String, validate: deliveryMethodValidator },
+    location: String,
+    notableDates: { start: Date, end: Date, otherDates: [Date] },
+    ongoing: Boolean
+  })
+);
 
 export default Conference;
