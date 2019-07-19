@@ -14,6 +14,7 @@ import { deliveryMethodValidator } from '../validation';
  *
  * ongoing: Is the certification ongoing?
  */
+
 const Certification = PdsaItem.discriminator(
   'Certification',
   new mongoose.Schema({
@@ -23,11 +24,7 @@ const Certification = PdsaItem.discriminator(
       required: false
     },
     deliveryMethod: { type: String, validate: deliveryMethodValidator }, // 'Online', 'InClass', 'Both'
-    location: {
-      country: String,
-      province: String,
-      city: String
-    },
+    location: String,
     ongoing: Boolean
   })
 );

@@ -142,10 +142,12 @@ export const createFilterForMongooseQuery = async urlQuery => {
     mongooseQuery['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
 
   // add filters for location
-  if (!undefinedNullOrEmpty(urlQuery.country)) mongooseQuery['location.country'] = urlQuery.country;
-  if (!undefinedNullOrEmpty(urlQuery.province))
-    mongooseQuery['location.province'] = urlQuery.province;
-  if (!undefinedNullOrEmpty(urlQuery.city)) mongooseQuery['location.city'] = urlQuery.city;
+  if (!undefinedNullOrEmpty(urlQuery.location)) {
+    const locations = urlQuery.location.split(',');
+    mongooseQuery.$or = locations.map(l => {
+      return { location: l.trim() };
+    });
+  }
 
   // add filters for deliveryMethod
   if (!undefinedNullOrEmpty(urlQuery.deliveryMethod))
@@ -188,6 +190,7 @@ export const createFilterForMongooseQuery = async urlQuery => {
   if (searching) {
     return mongooseSearchQuery;
   }
+
   // otherwise, if we are not searching either return the filtered query or null
   return Object.entries(mongooseQuery).length > 0 ? mongooseQuery : null;
 };

@@ -8,8 +8,23 @@ import {
   findMetadataByName,
   findMetadataByParentId
 } from '../controllers/metadataCrudController';
+import PdsaItem from '../database/models/pdsaItem';
 
 const router = express.Router();
+
+// ///////// //
+// LOCATIONS //
+// ///////// //
+
+// This needs to go before the generic routes so that we don't drop into CRUD routes for metadata with invalid :type
+/**
+ * This route provides an array of all the location strings in the database
+ */
+router.get('/locations', async (req, res) => {
+  const results = (await PdsaItem.find().select('location')).map(x => x.location);
+  res.send(results);
+});
+
 // ////// //
 // CREATE //
 // ////// //

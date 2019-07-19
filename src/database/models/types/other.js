@@ -22,6 +22,7 @@ import { deliveryMethodValidator } from '../validation';
  *
  * ongoing: Is this ongoing?
  */
+
 const Other = PdsaItem.discriminator(
   'Other',
   new mongoose.Schema({
@@ -36,11 +37,7 @@ const Other = PdsaItem.discriminator(
       required: false
     },
     deliveryMethod: { type: String, validate: deliveryMethodValidator },
-    location: {
-      country: String,
-      province: String,
-      city: String
-    },
+    location: String,
     duration: String,
     notableDates: { start: Date, end: Date, otherDates: [Date] },
     ongoing: Boolean

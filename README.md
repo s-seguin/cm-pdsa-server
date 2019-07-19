@@ -238,7 +238,7 @@ This model is used to store certifications as PDSA items. It inherits from **PDS
 | comments                  | Any additional comments HR would like to attach.                                                                         | `String`                                                                                       | `false`              |
 | **institution**           | **A reference to the institution offering the certification.**                                                           | **`ObjectId`**                                                                                 | **`false`**          |
 | **deliveryMethod**        | **Whether the certification is offered `online`, `in-class` or `both`.**                                                 | **`String`**                                                                                   | **`false`**          |
-| **location**              | **The location the certification is from or being offered.**                                                             | **{ country: `String`, province: `String`, city:`String` }**                                   | **`false`**          |
+| **location**              | **The location the certification is from or being offered. With no commas.**                                             | **`String`**                                                                                   | **`false`**          |
 | **ongoing**               | **Denotes whether or not the certification is currently being offered and ongoing.**                                     | **`Boolean`**                                                                                  | **`false`**          |
 | visible                   | Denotes whether item is visible or invisible to employees.                                                               | `Boolean`                                                                                      | `true`               |
 | _\_id_                    | Auto generated ObjectId                                                                                                  | `ObjectId`                                                                                     | _Created by MongoDb_ |
@@ -267,11 +267,7 @@ To create a new `Certification` supply an object like:
     },
     institution: "x56jb85db03eda5c68e3b9718",
     deliveryMethod: "online",
-    location: {
-        country: "Canada",
-        province: "Alberta",
-        city: "Calgary"
-    }
+    location: "Calgary AB Canada"
     ongoing: true,
     visible: true
 }
@@ -300,7 +296,7 @@ This model is used to store conferences as PDSA items. It inherits from **PDSAIt
 | comments                  | Any additional comments HR would like to attach.                                                                         | `String`                                                                                       | `false`              |
 | **institution**           | **A reference to the institution offering the conference.**                                                              | **`ObjectId`**                                                                                 | **`false`**          |
 | **deliveryMethod**        | **Whether the conference is offered `online`, `in-class` or `both`.**                                                    | **`String`**                                                                                   | **`false`**          |
-| **location**              | **The location the conference is from or being offered.**                                                                | **{ country: `String`, province: `String`, city:`String` }**                                   | **`false`**          |
+| **location**              | **The location the certification is from or being offered. With no commas.**                                             | **`String`**                                                                                   | **`false`**          |
 | **notableDates**          | **An object containing the start and end date of the conference, and any other notable dates.**                          | **{ start: `Date`, end: `Date`, otherDates:[`Date`] }**                                        | **`false`**          |
 | **ongoing**               | **Denotes whether or not the conference is currently being offered and ongoing.**                                        | **`Boolean`**                                                                                  | **`false`**          |
 | visible                   | Denotes whether item is visible or invisible to employees.                                                               | `Boolean`                                                                                      | `true`               |
@@ -330,17 +326,13 @@ To create a new `Conference` supply an object like:
     },
     institution: "x56jb85db03eda5c68e3b9718",
     deliveryMethod: "online",
-    location: {
-        country: "Canada",
-        province: "Alberta",
-        city: "Calgary"
-    }
+    location: "Calgary AB Canada",
     notableDates: {
         start: "2019-01-01",
         end: "2019-02-01",
         otherDates: ["1999-12-31"]
 
-    }
+    },
     ongoing: true,
     visible: true
 }
@@ -370,7 +362,7 @@ This model is used to store courses and seminars as PDSA items. It inherits from
 | **institution**           | **A reference to the institution offering the course or seminar.**                                                       | **`ObjectId`**                                                                                 | **`false`**          |
 | **program**               | **A reference to the program the course or seminar is a part of.**                                                       | **`ObjectId`**                                                                                 | **`false`**          |
 | **deliveryMethod**        | **Whether the course - seminar is offered `online`, `in-class` or `both`.**                                              | **`String`**                                                                                   | **`false`**          |
-| **location**              | **The location the course seminar is from or being offered.**                                                            | **{ country: `String`, province: `String`, city:`String` }**                                   | **`false`**          |
+| **location**              | **The location the certification is from or being offered. With no commas.**                                             | **`String`**                                                                                   | **`false`**          |
 | **notableDates**          | **An object containing the start and end date of the course or seminar, and any other notable dates.**                   | **{ start: `Date`, end: `Date`, otherDates:[`Date`] }**                                        | **`false`**          |
 | **ongoing**               | **Denotes whether or not the course seminar is currently being offered and ongoing.**                                    | **`Boolean`**                                                                                  | **`false`**          |
 | visible                   | Denotes whether item is visible or invisible to employees.                                                               | `Boolean`                                                                                      | `true`               |
@@ -401,17 +393,13 @@ To create a new `course-seminar` supply an object like:
     institution: "x56jb85db03eda5c68e3b9718",
     program: "k899adb03eda5c68e4cf9871",
     deliveryMethod: "online",
-    location: {
-        country: "Canada",
-        province: "Alberta",
-        city: "Calgary"
-    }
+    location: "Calgary AB Canada",
     notableDates: {
         start: "2019-01-01",
         end: "2019-02-01",
         otherDates: ["1999-12-31"]
 
-    }
+    },
     ongoing: true,
     visible: true
 }
@@ -499,7 +487,7 @@ This model is used to store all other PDSA items that do not belong to book, cer
 | **institution**           | **A reference to the institution offering the item.**                                                                    | **`ObjectId`**                                                                                 | **`false`**          |
 | **program**               | **A reference to the program the item is a part of.**                                                                    | **`ObjectId`**                                                                                 | **`false`**          |
 | **deliveryMethod**        | **Whether the item is offered `online`, `in-class` or `both`.**                                                          | **`String`**                                                                                   | **`false`**          |
-| **location**              | **The location the item is from or being offered.**                                                                      | **{ country: `String`, province: `String`, city:`String` }**                                   | **`false`**          |
+| **location**              | **The location the certification is from or being offered. With no commas.**                                             | **`String`**                                                                                   | **`false`**          |
 | **notableDates**          | **An object containing the start and end date of the item, and any other notable dates.**                                | **{ start: `Date`, end: `Date`, otherDates:[`Date`] }**                                        | **`false`**          |
 | **ongoing**               | **Denotes whether or not the item is currently being offered and ongoing.**                                              | **`Boolean`**                                                                                  | **`false`**          |
 | visible                   | Denotes whether item is visible or invisible to employees.                                                               | `Boolean`                                                                                      | `true`               |
@@ -530,17 +518,13 @@ To create a new `Other` supply an object like:
     institution: "x56jb85db03eda5c68e3b9718",
     program: "j45gb78bd03cwo5c68e3b0127",
     deliveryMethod: "online",
-    location: {
-        country: "Canada",
-        province: "Alberta",
-        city: "Calgary"
-    }
+    location: "Calgary AB Canada",
     notableDates: {
         start: "2019-01-01",
         end: "2019-02-01",
         otherDates: ["1999-12-31"]
 
-    }
+    },
     ongoing: true,
     visible: true
 }
@@ -555,6 +539,39 @@ _Please note:_ Supplied other example only used mandatory fields.
 ### Metadata
 
 ---
+
+#### Get all locations
+
+This route is used to grab all the locations being used in the database.
+
+##### URL
+
+`HTTP GET http://cm-pdsa-server/metadata/locations`
+
+##### Response
+
+| Status                                | Code  | Response                                                                |
+| ------------------------------------- | ----- | ----------------------------------------------------------------------- |
+| Fetched successfully                  | `200` | Server responds with an array of locations.                             |
+| Invalid type                          | `400` | Server responds with error message.                                     |
+| Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object. |
+
+##### Examples
+
+###### Retrieving all Institutions
+
+```Javascript
+GET 'http://cm-pdsa-server/metadata/locations'
+```
+
+```Javascript
+RESPONSE:
+[
+    "Calgary AB Canada",
+    "Toronto ON Canada",
+    "Chicago USA"
+]
+```
 
 #### Create
 
@@ -614,7 +631,7 @@ POST http://cm-pdsa-server/metadata/secondary-skills
 REQUEST.BODY:
 {
     name: "Teamwork",
-    parentPrimarySkillArea: "5d27b965360bcc6761543637"
+    primarySkillAreaReferences: ["5d27b965360bcc6761543637"]
 }
 ```
 
@@ -623,7 +640,7 @@ RESPONSE:
 {
     "_id": "5d27b993360bcc6761543638",
     "name": "Teamwork",
-    "parentPrimarySkillArea": "5d27b965360bcc6761543637",
+    "primarySkillAreaReferences": ["5d27b965360bcc6761543637"],
     "__v": 0
 }
 ```
@@ -661,7 +678,7 @@ No request body should be supplied.
 
 | Status                                | Code  | Response                                                                                                                                                                                                                              |
 | ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Updated successfully                  | `200` | Server responds with the object requested when specified by `id`. Otherwise an object containing `docs` which is an array of all objects (Mongo documents) matching the request and `totalDocs` which is the count of docs in `docs`. |
+| Fetched successfully                  | `200` | Server responds with the object requested when specified by `id`. Otherwise an object containing `docs` which is an array of all objects (Mongo documents) matching the request and `totalDocs` which is the count of docs in `docs`. |
 | Invalid type                          | `400` | Server responds with error message.                                                                                                                                                                                                   |
 | Server error (often invalid ObjectId) | `500` | Server responds with the error message throw while creating the object.                                                                                                                                                               |
 
@@ -775,21 +792,23 @@ RESPONSE:
 ###### Retrieving all SecondarySkillAreas under by the 'Learning and Development'
 
 ```Javascript
-GET 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d27b965360bcc6761543637'
+GET 'http://cm-pdsa-server/metadata/secondary-skills/parent-id/5d30a1a7018fdd1d70dee024'
 ```
 
 ```Javascript
 RESPONSE:
 {
     "docs": [
-        {
-            "_id": "5d28e5b66778eb82b6ef13f4",
-            "name": "Teamwork",
-            "parentPrimarySkillArea": {
-                "_id": "5d27b965360bcc6761543637",
-                "name": "Learning and Development",
-                "__v": 0
-            },
+         {
+            "primarySkillAreaReferences": [
+                {
+                    "_id": "5d30a1a7018fdd1d70dee024",
+                    "name": "Learning and Development",
+                    "__v": 0
+                }
+            ],
+            "_id": "5d30cfd9a4841731c45f8250",
+            "name": "Python",
             "__v": 0
         }
     ],
@@ -933,7 +952,7 @@ No request body should be supplied.
 ###### Deleting the 'Learning and Growth' PrimarySkillArea
 
 ```Javascript
-DELETE 'http://cm-pdsa-server/metadata/primary-skills/5d27b965360bcc6761543637'
+DELETE 'http://cm-pdsa-server/pdsa/primary-skills/5d27b965360bcc6761543637'
 ```
 
 ```Javascript
@@ -1008,11 +1027,7 @@ REQUEST.BODY:
     institution: "x56jb85db03eda5c68e3b9718",
     program: "j45gb78bd03cwo5c68e3b0127",
     deliveryMethod: "online",
-    location: {
-        country: "Canada",
-        province: "Alberta",
-        city: "Calgary"
-    },
+    location: "Calgary AB Canada",
     notableDates: {
         start: "2019-01-01",
         end: "2019-02-01",
@@ -1094,26 +1109,24 @@ These routes are used to query the database for PDSA Items. It allows for basic 
 
 Query Paramters go after the **?** and are separated with **&**. E.g. `http://cm-pdsa-server/pdsa/pdsa-items?primarySkillAreas=5d2cdd272fa1b9a44cd3d9a5,5d2cebc6c240d7aa3edafded&visible=true&startDate=2019-01-01&endDate=2020-01-01&sort=name:asc,primary:desc&limit=1&page=1`
 
-| Parameter               | Description                                                                                                                                                                        | Example                                                              |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `primarySkillAreas`     | A comma separated list of primarySkillArea ids.                                                                                                                                    | primarySkillAreas=5d2cdd272fa1b9a44cd3d9a5, 5d24ea012ffce00d3d1148e3 |
-| `secondarySkillAreas`   | A comma separated list of secondarySkillArea ids.                                                                                                                                  | secondarySkillAreas=5d2df51e26c371b9ed33a054                         |
-| `search`                | Searches (pseudo fuzzy) _name_, and the names of: _primarySkillAreas_ and _secondarySkillAreas_. **Note:** only searches the skill areas if you are not filtering by them as well. | search=Leadership and Development                                    |
-| `minCost`               | Filter by exact match on minCost                                                                                                                                                   | minCost=12.4                                                         |
-| `maxCost`               | Filter by exact match on maxCost                                                                                                                                                   | maxCost=113                                                          |
-| `currency`              | Filter by exact match on currency (case insensitive)                                                                                                                               | currency=CAD                                                         |
-| `groupPricingAvailable` | Filter whether `true` or `false`                                                                                                                                                   | groupPricingAvailable=true                                           |
-| `country`               | Filters exact match to country                                                                                                                                                     | country=Canada                                                       |
-| `province`              | Filters exact match to province                                                                                                                                                    | country=Alberta                                                      |
-| `city`                  | Filters exact match to calgary                                                                                                                                                     | city=Calgary                                                         |
-| `deliveryMethod`        | Filters exact match on deliveryMethod.                                                                                                                                             | deliveryMethod=in-class                                              |
-| `startingPdsaTier`      | Filters exact match on startingPdsaTier                                                                                                                                            | startingPdsaTier=3                                                   |
-| `visible`               | Filters on visible or invisible                                                                                                                                                    | visible=true                                                         |
-| `institution`           | Filters on exact match to one ObjectId reference to institution                                                                                                                    | institution=5d28e2886778eb82b6ef13f1                                 |
-| `program`               | Filters on exact match to one ObjectId reference to program                                                                                                                        | program=5d0bbce9a4e95add5f4f82e2                                     |
-| `startDate`, `endDate`  | Filter to all dates inbetween startDate and endDate                                                                                                                                | startDate=2019-01-01&endDate=2020-01-01                              |
-| `limit`, `page`         | Used for pagination. Limit to a certain number of entries per page and specify page you want.                                                                                      | limit=1&page=2                                                       |
-| `sort`                  | Used for sorting data by either name, primary or secondary skills in either ascending (`asc`) or descending (`desc`) order.                                                        | sort=name:desc,primary:desc                                          |
+| Parameter               | Description                                                                                                                                                                                                                                                         | Example                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `primarySkillAreas`     | A comma separated list of primarySkillArea ids.                                                                                                                                                                                                                     | primarySkillAreas=5d2cdd272fa1b9a44cd3d9a5, 5d24ea012ffce00d3d1148e3 |
+| `secondarySkillAreas`   | A comma separated list of secondarySkillArea ids.                                                                                                                                                                                                                   | secondarySkillAreas=5d2df51e26c371b9ed33a054                         |
+| `search`                | Searches (pseudo fuzzy) _name_, and the names of: _primarySkillAreas_ and _secondarySkillAreas_. **Note:** only searches the skill areas if you are not filtering by them as well.                                                                                  | search=Leadership and Development                                    |
+| `minCost`               | Filter by exact match on minCost                                                                                                                                                                                                                                    | minCost=12.4                                                         |
+| `maxCost`               | Filter by exact match on maxCost                                                                                                                                                                                                                                    | maxCost=113                                                          |
+| `currency`              | Filter by exact match on currency (case insensitive)                                                                                                                                                                                                                | currency=CAD                                                         |
+| `groupPricingAvailable` | Filter whether `true` or `false`                                                                                                                                                                                                                                    | groupPricingAvailable=true                                           |
+| `location`              | Filters to match locations provided. **Note:** location should be a comma separated list of locations with no commas in the location itself. E.g. `location=Calgary AB, Chicago USA` is OK `location=Calgary, AB, Canada, Chicago, USA` is not OK (we split on `,`) | location=Chicago USA, Calgary AB Canada, Toronto ON Canada           |
+| `deliveryMethod`        | Filters exact match on deliveryMethod.                                                                                                                                                                                                                              | deliveryMethod=in-class                                              |
+| `startingPdsaTier`      | Filters exact match on startingPdsaTier                                                                                                                                                                                                                             | startingPdsaTier=3                                                   |
+| `visible`               | Filters on visible or invisible                                                                                                                                                                                                                                     | visible=true                                                         |
+| `institution`           | Filters on exact match to one ObjectId reference to institution                                                                                                                                                                                                     | institution=5d28e2886778eb82b6ef13f1                                 |
+| `program`               | Filters on exact match to one ObjectId reference to program                                                                                                                                                                                                         | program=5d0bbce9a4e95add5f4f82e2                                     |
+| `startDate`, `endDate`  | Filter to all dates inbetween startDate and endDate                                                                                                                                                                                                                 | startDate=2019-01-01&endDate=2020-01-01                              |
+| `limit`, `page`         | Used for pagination. Limit to a certain number of entries per page and specify page you want.                                                                                                                                                                       | limit=1&page=2                                                       |
+| `sort`                  | Used for sorting data by either name, primary or secondary skills in either ascending (`asc`) or descending (`desc`) order.                                                                                                                                         | sort=name:desc,primary:desc                                          |
 
 ##### Body
 

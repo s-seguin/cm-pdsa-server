@@ -18,6 +18,7 @@ import { deliveryMethodValidator } from '../validation';
  *
  * ongoing: Is the course ongoing?
  */
+
 const CourseSeminar = PdsaItem.discriminator(
   'CourseSeminar',
   new mongoose.Schema({
@@ -32,11 +33,7 @@ const CourseSeminar = PdsaItem.discriminator(
       required: false
     },
     deliveryMethod: { type: String, validate: deliveryMethodValidator },
-    location: {
-      country: String,
-      province: String,
-      city: String
-    },
+    location: String,
     notableDates: { start: Date, end: Date, otherDates: [Date] },
     ongoing: Boolean
   })
