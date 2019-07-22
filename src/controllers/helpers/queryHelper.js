@@ -3,6 +3,7 @@ import {
   getIdsOfSecondarySkillsMatchingSearch,
   getIdsOfPrimarySkillsMatchingSearch
 } from './searchHelper';
+import { capitalizeFirstLetter, makeSingular, convertHyphenToCamelCase } from './stringHelpers';
 
 /**
  * Checks if an object is null, undefined or whitespace.
@@ -77,13 +78,20 @@ export const createSortForMongooseQuery = urlQuery => {
 };
 
 /**
+ * Given a string that will most likely match the url types parameter (e.g. course-seminars, books, other, etc.) convert it to the mongoose type (CourseSeminar, Book, Other, etc.)
+ * @param {String} str
+ */
+export const convertTypeToMongooseType = str =>
+  capitalizeFirstLetter(makeSingular(convertHyphenToCamelCase(str.trim())));
+
+/**
  * Creates an object to filter Mongoose queries based on the parameters passed in the Request.query
  * @param {Request.query} urlQuery
  */
 export const createFilterForMongooseQuery = async urlQuery => {
   const mongooseQuery = {};
-  let searching = false;
   const mongooseSearchQuery = { $or: [] };
+  const typeQuery = {};
 
   // add filters for skills -> matches primary skill area ids
   // user can pass in a list of ids separated via commas, split them and trim all whitespace
@@ -101,8 +109,6 @@ export const createFilterForMongooseQuery = async urlQuery => {
   // else search across name and unset skill areas
   // query is an OR -> Get all items where name matches search OR primarySkillAreas matches search OR secondarySkillAreas matches search
   if (!undefinedNullOrEmpty(urlQuery.search)) {
-    searching = true;
-
     // add name to search query (uses text index)
     mongooseSearchQuery.$or.push({ $text: { $search: urlQuery.search } });
 
@@ -182,15 +188,25 @@ export const createFilterForMongooseQuery = async urlQuery => {
     };
   }
 
-  // if we are searching and filtering, the query to return is searchQuery AND mongooseQuery
-  if (searching && Object.entries(mongooseQuery).length > 0) {
-    return { $and: [mongooseQuery, mongooseSearchQuery] };
-  }
-  // if we are only searching, just return the searchQuery
-  if (searching) {
-    return mongooseSearchQuery;
+  // filter to allow multiple times at once
+  if (!undefinedNullOrEmpty(urlQuery.type)) {
+    const types = urlQuery.type.split(',');
+    typeQuery.$or = types.map(type => {
+      return {
+        __t: convertTypeToMongooseType(type)
+      };
+    });
   }
 
-  // otherwise, if we are not searching either return the filtered query or null
-  return Object.entries(mongooseQuery).length > 0 ? mongooseQuery : null;
+  // Combine all our different queries into a single and statement
+  // i.e. general query matching AND search match AND types matching
+  const joinedQuery = { $and: [] };
+  if (typeQuery.$or && typeQuery.$or.length > 0) joinedQuery.$and.push(typeQuery);
+  if (mongooseSearchQuery.$or && mongooseSearchQuery.$or.length > 0)
+    joinedQuery.$and.push(mongooseSearchQuery);
+  if (mongooseQuery && Object.entries(mongooseQuery).length > 0)
+    joinedQuery.$and.push(mongooseQuery);
+
+  console.log(`Q: ${JSON.stringify(joinedQuery)}`);
+  return joinedQuery.$and.length > 0 ? joinedQuery : null;
 };
