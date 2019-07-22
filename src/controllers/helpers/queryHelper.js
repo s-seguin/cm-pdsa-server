@@ -135,9 +135,26 @@ export const createFilterForMongooseQuery = async urlQuery => {
     }
   }
 
-  // add filters for cost
-  if (!undefinedNullOrEmpty(urlQuery.minCost)) mongooseQuery['cost.minCost'] = urlQuery.minCost;
-  if (!undefinedNullOrEmpty(urlQuery.maxCost)) mongooseQuery['cost.maxCost'] = urlQuery.maxCost;
+  // // add filters for cost
+  // if (!undefinedNullOrEmpty(urlQuery.minCost)) mongooseQuery['cost.minCost'] = urlQuery.minCost;
+  // if (!undefinedNullOrEmpty(urlQuery.maxCost)) mongooseQuery['cost.maxCost'] = urlQuery.maxCost;
+  if (!undefinedNullOrEmpty(urlQuery.minCost) && !undefinedNullOrEmpty(urlQuery.maxCost)) {
+    mongooseQuery['cost.minCost'] = {
+      $gte: Number(urlQuery.minCost),
+      $lte: Number(urlQuery.maxCost)
+    };
+
+    if (
+      !undefinedNullOrEmpty(urlQuery.filterIncludeMaxCost) &&
+      urlQuery.filterIncludeMaxCost.trim().toLowerCase() === 'true'
+    ) {
+      mongooseQuery['cost.maxCost'] = {
+        $gte: Number(urlQuery.minCost),
+        $lte: Number(urlQuery.maxCost)
+      };
+    }
+  }
+
   if (!undefinedNullOrEmpty(urlQuery.currency))
     mongooseQuery['cost.currency'] = urlQuery.currency.toUpperCase();
   if (
@@ -145,7 +162,8 @@ export const createFilterForMongooseQuery = async urlQuery => {
     (urlQuery.groupPricingAvailable.trim().toLowerCase() === 'true' ||
       urlQuery.groupPricingAvailable.trim().toLowerCase() === 'false')
   )
-    mongooseQuery['cost.groupPricingAvailable'] = urlQuery.groupPricingAvailable === 'true';
+    mongooseQuery['cost.groupPricingAvailable'] =
+      urlQuery.groupPricingAvailable.trim().toLowerCase() === 'true';
 
   // add filters for location
   if (!undefinedNullOrEmpty(urlQuery.location)) {
