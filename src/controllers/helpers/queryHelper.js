@@ -192,8 +192,17 @@ export const createFilterForMongooseQuery = async urlQuery => {
 
   // Filter via dates
   if (!undefinedNullOrEmpty(urlQuery.startDate) && !undefinedNullOrEmpty(urlQuery.endDate)) {
-    const startDate = new Date(urlQuery.startDate);
-    const endDate = new Date(urlQuery.endDate);
+    let startDate = new Date(urlQuery.startDate);
+    let endDate = new Date(urlQuery.endDate);
+
+    // the dates stored in the database are stored in the timezone passed from the client
+    // we simulate our Timezone being UTC and look at all dates in between the start of the startDate they provide and the end of the end date they provided
+    startDate = new Date(
+      `${startDate.toISOString().slice(0, startDate.toISOString().indexOf('T'))}T00:00:00.000Z`
+    );
+    endDate = new Date(
+      `${endDate.toISOString().slice(0, endDate.toISOString().indexOf('T'))}T23:59:59.000Z`
+    );
 
     mongooseQuery['notableDates.start'] = {
       $gte: startDate,
