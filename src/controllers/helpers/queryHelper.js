@@ -234,6 +234,5 @@ export const createFilterForMongooseQuery = async urlQuery => {
   if (mongooseQuery && Object.entries(mongooseQuery).length > 0)
     joinedQuery.$and.push(mongooseQuery);
 
-  console.log(`Q: ${JSON.stringify(joinedQuery)}`);
   return joinedQuery.$and.length > 0 ? joinedQuery : null;
 };
