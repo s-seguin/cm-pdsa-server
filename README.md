@@ -30,8 +30,13 @@ Database connects to local `test` MongoDB via Mongoose, connection is opened upo
 
 ## Running
 
-1. `npm i` to install all dependencies.
-2. `npm start` to start server using `nodemon`.
+1. Ensure MongoDB is installed and running as a service.
+   - Follow this guide to install and start: <https://gist.github.com/nrollr/9f523ae17ecdbb50311980503409aeb3>
+   - Summary:
+     - `$ brew install mongodb` -> use to install
+     - `$ brew services start mongodb` -> use to start service
+2. `npm i` to install all dependencies.
+3. `npm start` to start server using `nodemon`.
 
 ## Models
 
