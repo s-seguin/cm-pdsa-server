@@ -29,6 +29,41 @@ const getPdsaItemModel = itemName =>
   }[itemName] || null);
 
 /**
+ * Retrieve the skill area name for the provided ID
+ *
+ * @param {ObjectId} firstSkillArea
+ */
+const getPrimarySortKeyName = async firstSkillArea => {
+  // check if they are updating the primary skill areas and update the sort key too
+  const primarySkillArea = await PrimarySkillArea.findById(firstSkillArea);
+
+  if (!primarySkillArea) {
+    throw new Error(
+      'At least one of the provided primary skill area references, does not reference an existing PrimarySkillArea.'
+    );
+  }
+
+  return primarySkillArea.name;
+};
+
+/**
+ * Retrieve the skill area name for the provided ID
+ *
+ * @param {ObjectId} firstSkillArea
+ */
+const getSecondarySortKeyName = async firstSkillArea => {
+  // check if they are updating the secondary skill areas and update the sort key too
+  const secondarySkillArea = await SecondarySkillArea.findById(firstSkillArea);
+
+  if (!secondarySkillArea) {
+    throw new Error(
+      'At least one of the provided secondary skill area references, does not reference an existing SecondarySkillArea.'
+    );
+  }
+  return secondarySkillArea.name;
+};
+
+/**
  * Creates a new PdsaItem to store in the DB from the JSON data passed in the req.body.
  *
  * This is a generic controller that looks at the PDSA type being requested through the url parameters
@@ -43,16 +78,14 @@ export const create = async (req, res) => {
   if (ItemModel !== null && ItemModel !== PdsaItem) {
     try {
       // Add the sort keys to the item
-      if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0) {
-        req.body.primarySkillAreaSortKey = (await PrimarySkillArea.findById(
+      if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0)
+        req.body.primarySkillAreaSortKey = await getPrimarySortKeyName(
           req.body.primarySkillAreas[0]
-        )).name;
-      }
-      if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0) {
-        req.body.secondarySkillAreaSortKey = (await SecondarySkillArea.findById(
+        );
+      if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0)
+        req.body.secondarySkillAreaSortKey = await getSecondarySortKeyName(
           req.body.secondarySkillAreas[0]
-        )).name;
-      }
+        );
 
       // we need to instantiate a new Object of type determined by the pdsaItemSwitch
       const instantiatedItem = new ItemModel(req.body);
@@ -187,19 +220,15 @@ export const update = async (req, res) => {
             `Error: You are forbidden from modifying the sort keys for this object. They are automatically updated based on the primary and secondary skill areas of this object.`
           );
       } else {
-        // check if they are updating the primary skill areas and update the sort key too
-        if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0) {
-          req.body.primarySkillAreaSortKey = (await PrimarySkillArea.findById(
+        // check if they are updating the skill areas and update the sort keys too
+        if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0)
+          req.body.primarySkillAreaSortKey = await getPrimarySortKeyName(
             req.body.primarySkillAreas[0]
-          )).name;
-        }
-
-        // check if they are updating the secondary skill areas and update the sort key too
-        if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0) {
-          req.body.secondarySkillAreaSortKey = (await SecondarySkillArea.findById(
+          );
+        if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0)
+          req.body.secondarySkillAreaSortKey = await getSecondarySortKeyName(
             req.body.secondarySkillAreas[0]
-          )).name;
-        }
+          );
 
         const results = await ItemModel.updateOne({ _id: req.params.id }, req.body, {
           runValidators: true
@@ -236,21 +265,19 @@ export const updateMany = async (req, res) => {
               `Error: You are forbidden from modifying the sort keys for this object. They are automatically updated based on the primary and secondary skill areas of this object.`
             );
         } else {
-          // check if they are updating the primary skill areas and update the sort key too
-          if (req.body.updates.primarySkillAreas && req.body.updates.primarySkillAreas.length > 0) {
-            req.body.updates.primarySkillAreaSortKey = (await PrimarySkillArea.findById(
+          // check if they are updating the skill areas and update the sort keys too
+          if (req.body.updates.primarySkillAreas && req.body.updates.primarySkillAreas.length > 0)
+            req.body.updates.primarySkillAreaSortKey = await getPrimarySortKeyName(
               req.body.updates.primarySkillAreas[0]
-            )).name;
-          }
-          // check if they are updating the secondary skill areas and update the sort key too
+            );
           if (
             req.body.updates.secondarySkillAreas &&
             req.body.updates.secondarySkillAreas.length > 0
-          ) {
-            req.body.updates.secondarySkillAreaSortKey = (await SecondarySkillArea.findById(
+          )
+            req.body.updates.secondarySkillAreaSortKey = await getSecondarySortKeyName(
               req.body.updates.secondarySkillAreas[0]
-            )).name;
-          }
+            );
+
           const results = await ItemModel.updateMany(
             { _id: { $in: req.body.ids } },
             req.body.updates,

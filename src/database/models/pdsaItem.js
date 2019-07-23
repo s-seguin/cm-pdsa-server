@@ -69,12 +69,10 @@ const pdsaItemSchema = mongoose.Schema({
     required: true,
     validate: costValidator
   },
-  previousAttendees: [String],
   reviews: [
     {
       rating: Number,
-      review: String,
-      reviewedBy: String
+      review: String
     }
   ],
   comments: String,

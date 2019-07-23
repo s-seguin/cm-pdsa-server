@@ -100,6 +100,15 @@ const minCostLessThanMaxCostValidator = cost => {
 };
 
 /**
+ * Check that the provided min and max costs are numbers.
+ * @param {Cost} cost
+ */
+const costIsNumber = cost => {
+  if (typeof cost.minCost === 'number' && typeof cost.maxCost === 'number') return true;
+  return false;
+};
+
+/**
  * A group of validators to check the cost object of a PDSA item
  */
 export const costValidator = [
@@ -111,5 +120,9 @@ export const costValidator = [
   {
     validator: validCurrencyCodeValidator,
     msg: 'The currency must be specified using a currency code. e.g. CAD for Canadian Dollars'
+  },
+  {
+    validator: costIsNumber,
+    msg: 'The provided min and max costs must be numbers.'
   }
 ];
