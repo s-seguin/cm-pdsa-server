@@ -244,6 +244,47 @@ export const update = async (req, res) => {
 };
 
 /**
+ * Update the specified pdsa item (specified by id) with the object sent in the request body
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const overwrite = async (req, res) => {
+  const ItemModel = getPdsaItemModel(req.params.type.toLowerCase());
+  if (ItemModel !== null) {
+    try {
+      // if they are trying to update the sort keys send an error
+      if (req.body.primarySkillAreaSortKey || req.body.secondarySkillAreaSortKey) {
+        res
+          .status(403)
+          .send(
+            `Error: You are forbidden from modifying the sort keys for this object. They are automatically updated based on the primary and secondary skill areas of this object.`
+          );
+      } else {
+        // check if they are updating the skill areas and update the sort keys too
+        if (req.body.primarySkillAreas && req.body.primarySkillAreas.length > 0)
+          req.body.primarySkillAreaSortKey = await getPrimarySortKeyName(
+            req.body.primarySkillAreas[0]
+          );
+        if (req.body.secondarySkillAreas && req.body.secondarySkillAreas.length > 0)
+          req.body.secondarySkillAreaSortKey = await getSecondarySortKeyName(
+            req.body.secondarySkillAreas[0]
+          );
+
+        const results = await ItemModel.update({ _id: req.params.id }, req.body, {
+          runValidators: true,
+          overwrite: true
+        });
+        res.status(201).send(results);
+      }
+    } catch (e) {
+      res.status(500).send(`Error: ${e}`);
+    }
+  } else {
+    res.status(400).send(`Error: Provided paramter :type was incorrect`);
+  }
+};
+
+/**
  * Update the PDSA items specified by the type and ids. The list of ids to update is in req.body.ids and the updates to be performed are in req.body.updates
  *
  * @param {Request} req

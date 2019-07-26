@@ -6,7 +6,8 @@ import {
   update,
   deleteItem,
   deleteMany,
-  updateMany
+  updateMany,
+  overwrite
 } from '../controllers/pdsaItemCrudController';
 
 const router = express.Router();
@@ -36,9 +37,9 @@ router.get('/:type/:id', findById);
 // UPDATE //
 // ////// //
 /**
- * Update the PDSA item specified by type and id
+ * Overwrite the PDSA item specified by type and id
  */
-router.put('/:type/:id', update);
+router.put('/:type/:id', overwrite);
 /**
  * Update the PDSA item specified by type and id
  */
