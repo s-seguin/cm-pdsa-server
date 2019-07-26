@@ -984,7 +984,7 @@ This route is used to create a new PDSA objects, specified by the type parameter
 
 ##### URL
 
-`HTTP POST http://cm-pdsa-server/metadata/:type`
+`HTTP POST http://cm-pdsa-server/pdsa/:type`
 
 ##### Parameters
 
@@ -2012,6 +2012,8 @@ This route is used to update an existing pdsa item, specified by the type and id
 `HTTP PUT http://cm-pdsa-server/pdsa/:type/:id`
 
 Use `PATCH` when updating some fields but not all. Use `PUT` when updating the entire object.
+
+**NOTE:** `PUT` replaces the entire object, patch is for minor changes.
 
 ##### Parameters
 
