@@ -219,6 +219,8 @@ export const createFilterForMongooseQuery = async urlQuery => {
     };
   }
 
+  if (!undefinedNullOrEmpty(urlQuery.ongoing)) mongooseQuery.ongoing = urlQuery.ongoing === 'true';
+
   // filter to allow multiple types at once
   if (!undefinedNullOrEmpty(urlQuery.type)) {
     const types = urlQuery.type.split(',');
@@ -239,7 +241,7 @@ export const createFilterForMongooseQuery = async urlQuery => {
     joinedQuery.$and.push(mongooseQuery);
   if (pdsaTierQuery.$or && pdsaTierQuery.$or.length > 0) joinedQuery.$and.push(pdsaTierQuery);
 
-  console.log(`Joined Query ${JSON.stringify(joinedQuery)}`);
+  console.log(`Joined Query ${joinedQuery}`);
 
   return joinedQuery.$and.length > 0 ? joinedQuery : null;
 };
