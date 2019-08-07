@@ -92,6 +92,7 @@ export const createFilterForMongooseQuery = async urlQuery => {
   const mongooseQuery = {};
   const mongooseSearchQuery = { $or: [] };
   const typeQuery = {};
+  const pdsaTierQuery = { $or: [] };
 
   // add filters for skills -> matches primary skill area ids
   // user can pass in a list of ids separated via commas, split them and trim all whitespace
@@ -136,8 +137,6 @@ export const createFilterForMongooseQuery = async urlQuery => {
   }
 
   // // add filters for cost
-  // if (!undefinedNullOrEmpty(urlQuery.minCost)) mongooseQuery['cost.minCost'] = urlQuery.minCost;
-  // if (!undefinedNullOrEmpty(urlQuery.maxCost)) mongooseQuery['cost.maxCost'] = urlQuery.maxCost;
   if (!undefinedNullOrEmpty(urlQuery.minCost) && !undefinedNullOrEmpty(urlQuery.maxCost)) {
     mongooseQuery['cost.minCost'] = {
       $gte: Number(urlQuery.minCost),
@@ -178,8 +177,13 @@ export const createFilterForMongooseQuery = async urlQuery => {
     mongooseQuery.deliveryMethod = urlQuery.deliveryMethod;
 
   // add filters for pdsa tier
-  if (!undefinedNullOrEmpty(urlQuery.startingPdsaTier))
-    mongooseQuery.startingPdsaTier = urlQuery.startingPdsaTier;
+  if (!undefinedNullOrEmpty(urlQuery.startingPdsaTier)) {
+    // mongooseQuery.startingPdsaTier = urlQuery.startingPdsaTier;
+    const pdsaTiers = urlQuery.startingPdsaTier.split(',');
+    pdsaTierQuery.$or = pdsaTiers.map(tier => {
+      return { startingPdsaTier: tier.trim() };
+    });
+  }
 
   // add filters for visibility
   if (!undefinedNullOrEmpty(urlQuery.visible)) mongooseQuery.visible = urlQuery.visible === 'true';
@@ -215,7 +219,9 @@ export const createFilterForMongooseQuery = async urlQuery => {
     };
   }
 
-  // filter to allow multiple times at once
+  if (!undefinedNullOrEmpty(urlQuery.ongoing)) mongooseQuery.ongoing = urlQuery.ongoing === 'true';
+
+  // filter to allow multiple types at once
   if (!undefinedNullOrEmpty(urlQuery.type)) {
     const types = urlQuery.type.split(',');
     typeQuery.$or = types.map(type => {
@@ -233,6 +239,7 @@ export const createFilterForMongooseQuery = async urlQuery => {
     joinedQuery.$and.push(mongooseSearchQuery);
   if (mongooseQuery && Object.entries(mongooseQuery).length > 0)
     joinedQuery.$and.push(mongooseQuery);
+  if (pdsaTierQuery.$or && pdsaTierQuery.$or.length > 0) joinedQuery.$and.push(pdsaTierQuery);
 
   return joinedQuery.$and.length > 0 ? joinedQuery : null;
 };
