@@ -1,11 +1,11 @@
 import express from 'express';
 import passport from 'passport';
+import request from 'request';
 import OneLoginStrategy from 'passport-openidconnect';
 
 require('dotenv').config();
 
 const router = express.Router();
-const http = require('http');
 
 const OIDC_BASE_URI = `https://openid-connect.onelogin.com/oidc`;
 
@@ -30,7 +30,8 @@ export function setupPassport() {
         userInfoURL: `${OIDC_BASE_URI}/me`,
         tokenURL: `${OIDC_BASE_URI}/token`,
         callbackURL: process.env.OIDC_REDIRECT_URI,
-        scope: 'profile'
+        scope: 'profile',
+        passReqToCallback: true
       },
       (issuer, sub, profile, jwtClaims, accessToken, refereshToken, tokenResponse, done) => {
         done(null, {
@@ -64,17 +65,28 @@ export function setupPassport() {
 
 /**
  * Check if a user is authenticated with OneLogin and redirect to appropriate page.
- * Users that are not logged in will be sent to /login
+ * If user is not logged in, 401 Unauthorized is returned.
+ * Will only allow requests that come from frontend application with a verified token.
  *
  * @param {Request} req the request object
  * @param {Response} res the response object
  * @param {Object} next the next object
  */
 export function isAuthenticated(req, res, next) {
-  if (req.isAuthenticated() && typeof req.user !== 'undefined') {
-    return next();
-  }
-  return res.status(307).redirect('/auth/login');
+  const token = req.headers.authorization;
+
+  request.post(
+    {
+      headers: { Authorization: token, 'Content-Type': 'application/x-www-form-urlencoded' },
+      url: 'https://openid-connect.onelogin.com/oidc/me'
+    },
+    (body, response) => {
+      if (response.statusCode === 200) {
+        return next();
+      }
+      return res.status(401).send('Unauthorized Access.');
+    }
+  );
 }
 
 /**
@@ -87,43 +99,26 @@ export function isAuthenticated(req, res, next) {
  * @param {Request} req the request object
  * @param {Response} res the response object
  */
-export function logout(req, res) {
-  if (typeof req.user === 'undefined') {
-    res.redirect('/');
-  }
-
-  // Setting the header for the POST request to OneLogin
-  const options = {
-    host: 'openid-connect.onelogin.com',
-    path: '/oidc/token/revocation',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: Buffer.from(
-        `${process.env.OIDC_CLIENT_ID}:${process.env.OIDC_CLIENT_SECRET}`
-      ).toString('base64')
+export function logout(req) {
+  const reqToken = req.headers.authorization;
+  request.post(
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.OIDC_CLIENT_ID}:${process.env.OIDC_CLIENT_SECRET}`
+        ).toString('base64')}`
+      },
+      url: 'https://openid-connect.onelogin.com/oidc/token/revocation',
+      body: `token=${reqToken}&token_type_hint=access_token`
+    },
+    (body, response, err) => {
+      if (err !== null || err !== '') {
+        return false;
+      }
+      return true;
     }
-  };
-
-  // Creating the request using options and handling the information returned from POST request
-  const request = http.request(options, response => {
-    let responseString = '';
-    // Save all the data from the response
-    response.on('data', data => {
-      responseString += data;
-    });
-    // Log information from request when request is completed
-    response.on('end', () => {
-      console.log(`Logout POST Response String: ${responseString}`);
-    });
-  });
-  // Create body information with access_token
-  const requestBody = `token=${req.session.passport.user.accessToken.token}&token_type_hint=access_token`;
-  // Submit the request
-  request.write(requestBody);
-  request.end();
-  req.logout();
-  res.status(200).send('Successfully Logged Out!');
+  );
 }
 
 export default router;

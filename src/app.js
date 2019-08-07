@@ -4,11 +4,14 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
+import cors from 'cors';
 
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 import { isAuthenticated } from './controllers/authController';
 import { indexRouter, pdsaCrudRouter, metadataCrudRouter } from './routes/index';
+
+require('dotenv').config();
 
 const app = express();
 
@@ -39,7 +42,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', usersRouter);
+// Allows CORS to only pass through certain domain requests
+app.use(
+  cors({
+    origin: process.env.ONELOGIN_FRONTEND_REDIRECT_URL
+  })
+);
+
+app.use('/users', isAuthenticated, usersRouter);
 
 // Authorization Routes
 app.use('/auth', authRouter);
@@ -48,6 +58,6 @@ app.use('/login', authRouter);
 app.use('/pdsa', isAuthenticated, pdsaCrudRouter);
 app.use('/metadata', isAuthenticated, metadataCrudRouter);
 
-app.use('/', isAuthenticated, indexRouter);
+app.use('/', indexRouter);
 
 export default app;
