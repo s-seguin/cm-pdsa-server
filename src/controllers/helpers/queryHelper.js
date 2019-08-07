@@ -241,7 +241,5 @@ export const createFilterForMongooseQuery = async urlQuery => {
     joinedQuery.$and.push(mongooseQuery);
   if (pdsaTierQuery.$or && pdsaTierQuery.$or.length > 0) joinedQuery.$and.push(pdsaTierQuery);
 
-  console.log(`Joined Query ${joinedQuery}`);
-
   return joinedQuery.$and.length > 0 ? joinedQuery : null;
 };
