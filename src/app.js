@@ -34,14 +34,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// allow CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, PUT, PATCH, POST, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
-
 // Allows CORS to only pass through certain domain requests
 app.use(
   cors({
