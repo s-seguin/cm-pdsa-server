@@ -18,15 +18,25 @@ router.get(
   })
 );
 
-// Logout user and destroy OneLogin session.
-router.get('/logout', logout);
+// Logout user from OneLogin and return necessary response to logout user.
+router.post('/logout', (req, res) => {
+  if (logout(req, res) === true) {
+    res.status(200).send();
+  }
+  res.status(401).send();
+});
 
 // Fetch user information from OneLogin when callback function is triggered and user is logged in
 router.get(
   '/callback',
-  passport.authenticate('openidconnect', { failureRedirect: '/auth/login' }),
+  passport.authenticate('openidconnect', {
+    callback: true,
+    failureRedirect: '/auth/login'
+  }),
   (req, res) => {
-    res.status(200).redirect('/');
+    res.redirect(
+      `${process.env.ONELOGIN_FRONTEND_REDIRECT_URL}/login/token/${req.user.accessToken.token}`
+    );
   }
 );
 
