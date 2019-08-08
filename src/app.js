@@ -37,7 +37,10 @@ app.use(passport.session());
 // Allows CORS to only pass through certain domain requests
 app.use(
   cors({
-    origin: process.env.ONELOGIN_FRONTEND_REDIRECT_URL
+    origin: [
+      process.env.ONELOGIN_FRONTEND_REDIRECT_URL,
+      process.env.ONELOGIN_FRONTEND_REDIRECT_URL_USER
+    ]
   })
 );
 
