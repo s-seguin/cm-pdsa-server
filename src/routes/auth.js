@@ -36,7 +36,8 @@ router.get(
   (req, res) => {
     res.redirect(
       `${
-        req.headers.referer.includes(process.env.ONELOGIN_FRONTEND_REDIRECT_URL)
+        req.headers.referer.includes(process.env.ONELOGIN_FRONTEND_REDIRECT_URL) &&
+        process.env.ADMIN_USER_ACCESS.includes(req.user.idToken.claims._json.preferred_username)
           ? process.env.ONELOGIN_FRONTEND_REDIRECT_URL
           : process.env.ONELOGIN_FRONTEND_REDIRECT_URL_USER
       }/login/token/${req.user.accessToken.token}`
