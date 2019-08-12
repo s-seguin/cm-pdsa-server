@@ -126,3 +126,19 @@ export const costValidator = [
     msg: 'The provided min and max costs must be numbers.'
   }
 ];
+
+/**
+ * Check and make sure that the start date is before or equal to the end date
+ * @param {Object} dates
+ */
+const startDateBeforeEndDate = dates => {
+  const start = new Date(dates.start);
+  const end = new Date(dates.end);
+
+  if (start > end) return false;
+  return true;
+};
+
+export const dateValidator = [
+  { validator: startDateBeforeEndDate, msg: 'Start date must be before or equal to end date.' }
+];

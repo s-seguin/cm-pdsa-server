@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import PdsaItem from '../pdsaItem';
-import { deliveryMethodValidator } from '../validation';
+import { deliveryMethodValidator, dateValidator } from '../validation';
 
 /**
  * This is the schema to hold a Generic PDSA item in the database.
@@ -39,7 +39,7 @@ const Other = PdsaItem.discriminator(
     deliveryMethod: { type: String, validate: deliveryMethodValidator },
     location: String,
     duration: String,
-    notableDates: { start: Date, end: Date, otherDates: [Date] },
+    notableDates: { type: { start: Date, end: Date, otherDates: [Date] }, validate: dateValidator },
     ongoing: Boolean
   })
 );
