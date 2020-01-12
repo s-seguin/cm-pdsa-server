@@ -4,12 +4,6 @@ CM PDSA - Admin Panel Server
 
 ## Getting Started
 
-#### Clone this repository
-
-```bash
-git clone ssh://git@bitbucket.criticalmass.com:7999/cip/cm-pdsa-server.git
-```
-
 ## Branching Strategy
 
 All development work should be done on your own branch.
